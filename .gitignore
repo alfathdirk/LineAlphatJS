@@ -1,4 +1,4 @@
-lib
-spec
+.DS_Store
+library
 node_modules
 thrift
