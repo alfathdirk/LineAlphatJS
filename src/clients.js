@@ -44,11 +44,8 @@ export class LineClient extends LineAPI {
     return this.longpoll();
   }
 
-  async up() {
-    await this._tokenLogin(this.authToken, this.certificate)
-    return this.longpoll();
-  }
-
+  
+  
   fetchOps(rev) {
     return this._fetchOps(rev, 5);
   }
