@@ -34,6 +34,9 @@ export class LineClient extends LineAPI {
       this._qrCodeLogin().then(async (res) => {
         this.authToken = res.authToken;
         this.certificate = res.certificate;
+        console.log(`
+          Your Token: is ${this.authToken}
+        `)
         resolve({ authToken: this.authToken, certificate: this.certificate })
       });
     });
