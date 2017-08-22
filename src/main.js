@@ -2,7 +2,8 @@ import { LineAPI } from './api';
 import { Message, OpType } from '../curve-thrift/line_types';
 
 let exec = require('child_process').exec;
-const myBot = 'u236b88bf1eac2b90e848a6198152e647';
+const admin = 'u236b88bf1eac2b90e848a6198152e647';
+const myBot = 'uc93c736a8b385208c2aa7aed58de2ceb';
 
 let optime = [];
 class LINE extends LineAPI {
@@ -15,25 +16,68 @@ class LINE extends LineAPI {
         for (let key in OpType) {
             if(operations.type == OpType[key]) {
                 if(key !== 'NOTIFIED_UPDATE_PROFILE') {
-                    console.log(`[*] ${key} `);
-                    console.log(`[ ${JSON.stringify(operations)} ]`);
+                    console.log(`[* ${operations.type} ] ${key} `);
+                    // console.log(`[ ${JSON.stringify(operations)} ]`);
                 }
             }
         }
     }
 
+
     poll(operation) {
+
         if(operation.type == 25 || operation.type == 26) {
             const txt = (operation.message.text !== '' && operation.message.text != null ) ? operation.message.text.toLowerCase() : '' ;
             let message = new Message();
-            this.receiverID = message.to = operation.message.to;
+            this.receiverID = message.to = (operation.message.to === myBot) ? operation.message.from : operation.message.to ;
             Object.assign(message,{ ct: operation.createdTime.toString() });
             this.textMessage(txt,message)
         }
+
+        if(operation.type == 13) {
+            this.cancelAll(operation.param1);
+        }
+
+        if(operation.type == 19) { //ada kick
+            // this.cancelAll(operation.param1);
+        }
+
+        if(operation.type == 13) { // diinvite
+            // if(operation.param2 == admin) {
+                return this._acceptGroupInvitation(operation.param1);
+            // }
+        }
+
         this.getOprationType(operation);
     }
 
+    async cancelAll(gid) {
+        let { listPendingInvite } = await this.searchGroup(gid);
+        if(listPendingInvite.length > 0){
+            this._cancel(gid,listPendingInvite);
+        }
+    }
+
+    async searchGroup(gid) {
+        let thisgroup = await this._getGroups([gid]);
+        let listPendingInvite = thisgroup[0].invitee.map((key) => {
+            return key.mid;
+        });
+        let listMember = thisgroup[0].members.map((key) => {
+            return { mid: key.mid, dn: key.displayName };
+        });
+
+        return { 
+            listMember,
+            listPendingInvite
+        }
+    }
+
     async textMessage(txt, seq) {
+
+        if(txt == 'cancel') {
+            this.cancelAll(seq.to);
+        }
 
         if(txt == 'halo' || txt == 'sya') {
             this._sendMessage(seq, 'halo disini tasya :)');
@@ -46,8 +90,8 @@ class LINE extends LineAPI {
 
         if(txt === 'processing....') {
             optime.push(seq.ct);
-            const rtime = (parseInt(optime[1]) - parseInt(optime[0])) / 1000;
-            this._sendMessage(seq, `Read time ${rtime} second`);
+            const rtime = (parseInt(optime[1]) - parseInt(optime[0])) / 1800;
+            this._sendMessage(seq, `${rtime} second`);
             optime = [];
         }
 
@@ -58,11 +102,10 @@ class LINE extends LineAPI {
         }
 
         if(txt === 'kickall') {
-            let thisgroup = await this._getGroups([seq.to]);
-            let totalMember = thisgroup[0].members;
-            for (var i = 0; i < totalMember.length; i++) {
-                if(totalMember[i].mid != myBot ){
-                    this._kickMember(seq.to,[totalMember[i].mid])
+            let { listMember } = await this.searchGroup(seq.to);
+            for (var i = 0; i < listMember.length; i++) {
+                if(listMember[i].mid != admin ){
+                    this._kickMember(seq.to,[listMember[i].mid])
                 }
             }
         }

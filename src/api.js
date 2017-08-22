@@ -153,10 +153,18 @@ export class LineAPI {
     return this._client.kickoutFromGroup(0,group,memid);
   }
 
+  _cancel(groupid,member) {
+    return this._client.cancelGroupInvitation(0,groupid,member);
+  }
+
+  _acceptGroupInvitation(groupid) {
+    return this._client.acceptGroupInvitation(0,groupid);
+  }
+
   async _getGroups(groupId) {
       const g = await this._client.getGroups(groupId);
       return g;
-}
+  }
 
   _sendImage(message,filepaths, filename = 'Line Image') {
     message.ContentType = ContentType.IMAGE;
