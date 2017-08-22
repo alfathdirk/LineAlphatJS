@@ -1,6 +1,8 @@
 import thrift from 'thrift-http';
 import unirest from 'unirest';
 import qrcode from 'qrcode-terminal';
+import fs from 'fs';
+import path from 'path';
 
 import { Promise as p2 } from 'bluebird';
 
@@ -8,7 +10,8 @@ import { Promise as p2 } from 'bluebird';
 import TalkService from '../curve-thrift/TalkService';
 import {
   LoginResultType,
-  IdentityProvider
+  IdentityProvider,
+  ContentType
 } from '../curve-thrift/line_types';
 
 
@@ -146,6 +149,52 @@ export class LineAPI {
     return this._client.sendMessage(0, message);
   }
 
+  _kickMember(group,memid) {
+    return this._client.kickoutFromGroup(0,group,memid);
+  }
+
+  async _getGroups(groupId) {
+      const g = await this._client.getGroups(groupId);
+      return g;
+}
+
+  _sendImage(message,filepaths, filename = 'Line Image') {
+    message.ContentType = ContentType.IMAGE;
+    const filepath = path.resolve(__dirname,filepaths)
+      fs.readFile(filepath,async (err, bufs) => {
+        let img = await this._client.sendMessage(message).id ;
+          const data = {
+            params: JSON.stringify({
+              name: filename,
+              oid: img,
+              size: bufs.length,
+              type: 'image',
+              ver: '1.0'
+            })
+          };
+          return this
+            .postContent(config.LINE_POST_CONTENT_URL, data, filepath)
+            .then((res) => (res.error ? console.log('err',res.error) : console.log('sxxxx',res)));
+      });
+  }
+
+  postContent(url, data = null, filepath = null) {
+    return new Promise((resolve, reject) => (
+      unirest.post(url)
+        .headers({
+          ...this.config.Headers,
+          'Content-Type': 'multipart/form-data'
+        })
+        .timeout(120000)
+        .field(data)
+        .attach('files', filepath)
+        .end((res) => {
+          console.log(res);
+          res.error ? reject(res.error) : resolve(res)
+        })
+    ));
+  }
+  
   _fetchOperations(revision, count = 50) {
     return this._client.fetchOperations(revision, count);
   }
