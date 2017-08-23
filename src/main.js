@@ -55,7 +55,6 @@ class LINE extends LineAPI {
             }
         }
         this.getOprationType(operation);
-        console.log(operation);
     }
 
     async cancelAll(gid) {
