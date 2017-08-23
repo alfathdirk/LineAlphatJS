@@ -10,9 +10,9 @@ let auth = {
 }
 // cl.then((auth) => {
 let server = http.createServer((req,res) => {
-	  res.statusCode = 200;
-		res.setHeader('Content-Type', 'text/plain');
-		res.end('Hello World\n');
+	res.statusCode = 200;
+	res.setHeader('Content-Type', 'text/plain');
+	res.end('Hello World\n');
 })
 
 server.listen(process.env.PORT || 5000,() => {
