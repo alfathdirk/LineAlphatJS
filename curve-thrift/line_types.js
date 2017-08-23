@@ -333,7 +333,7 @@ ttypes.OpStatus = {
   'NORMAL' : 0,
   'ALERT_DISABLED' : 1
 };
-ttypes.OpType = {
+ttypes.OperationType = {
   'END_OF_OPERATION' : 0,
   'UPDATE_PROFILE' : 1,
   'NOTIFIED_UPDATE_PROFILE' : 2,

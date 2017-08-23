@@ -15,12 +15,12 @@ export const config = {
   LINE_SESSION_NAVER_URL: '/authct/v1/keys/naver',
   LINE_POST_CONTENT_URL: 'https://os.line.naver.jp/talk/m/upload.nhn',
   ip: '127.0.0.1',
-  version: '4.6.1.931',
+  version: '0.0.2',
   revision: 0,
   hostname: hostname(),
   platform: whichPlatform,
   EMAIL_REGEX: /[^@]+@[^@]+\.[^@]+/,
   Headers: {
-    'User-Agent': 'js-line (LINE for webapp)'
+    'User-Agent': 'LINE for Alfath'
   }
 };

@@ -203,11 +203,13 @@ export class LineAPI {
     ));
   }
   
-  _fetchOperations(revision, count = 50) {
+  _fetchOperations(revision, count = 5) {
+    this.options.path = this.config.LINE_POLL_URL
+    this.setTHttpClient();
     return this._client.fetchOperations(revision, count);
   }
 
-  _fetchOps(revision, count = 50) {
+  _fetchOps(revision, count = 5) {
     return this._client.fetchOps(revision, count);
   }
 

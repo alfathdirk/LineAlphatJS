@@ -1,11 +1,15 @@
 import { LineAPI } from './api';
-import { Message, OpType } from '../curve-thrift/line_types';
+import { Message, OperationType } from '../curve-thrift/line_types';
 
 let exec = require('child_process').exec;
-const admin = 'u236b88bf1eac2b90e848a6198152e647';
+const admin = 'u236b88bf1eac2b90e848a6198152e6472';
 const myBot = 'uc93c736a8b385208c2aa7aed58de2ceb';
 
 let optime = [];
+let kicker = {
+    'namagrup123': ['user1','user1'],
+}
+
 class LINE extends LineAPI {
     constructor() {
         super();
@@ -13,8 +17,8 @@ class LINE extends LineAPI {
     }
 
     getOprationType(operations) {
-        for (let key in OpType) {
-            if(operations.type == OpType[key]) {
+        for (let key in OperationType) {
+            if(operations.type == OperationType[key]) {
                 if(key !== 'NOTIFIED_UPDATE_PROFILE') {
                     console.log(`[* ${operations.type} ] ${key} `);
                     // console.log(`[ ${JSON.stringify(operations)} ]`);
@@ -39,16 +43,19 @@ class LINE extends LineAPI {
         }
 
         if(operation.type == 19) { //ada kick
-            // this.cancelAll(operation.param1);
+            // Object.assign(kicker,{ [operation.param1] : operation.param2 });
+            this._kickMember(operation.param1,[operation.param2]);
         }
 
         if(operation.type == 13) { // diinvite
-            // if(operation.param2 == admin) {
+            if(operation.param2 == admin) {
                 return this._acceptGroupInvitation(operation.param1);
-            // }
+            } else {
+                return this._cancel(operation.param1,[myBot]);
+            }
         }
-
         this.getOprationType(operation);
+        console.log(operation);
     }
 
     async cancelAll(gid) {
@@ -90,7 +97,7 @@ class LINE extends LineAPI {
 
         if(txt === 'processing....') {
             optime.push(seq.ct);
-            const rtime = (parseInt(optime[1]) - parseInt(optime[0])) / 1800;
+            const rtime = (parseInt(optime[1]) - parseInt(optime[0])) / 1000;
             this._sendMessage(seq, `${rtime} second`);
             optime = [];
         }
@@ -108,6 +115,10 @@ class LINE extends LineAPI {
                     this._kickMember(seq.to,[listMember[i].mid])
                 }
             }
+        }
+
+        if(txt == 'pap'){
+            // 
         }
     }
 }
