@@ -1,5 +1,10 @@
 Line Alphat JS
 
+# require node >= v6
+check your nodejs version
+`node -v`
+[upgrade nodejs](https://google.com/)
+
 
 How to run ?
 ------
@@ -9,10 +14,11 @@ How to run ?
 
 
 Still work :construction_worker:
+----
 **TODO** features
 - Implement All 
 - Improve logic
 
 Author
 ------
-Alfathdirk [@alfathdirk](https://instagram.com/alfathdirk)
+[@alfathdirk](https://instagram.com/alfathdirk)
