@@ -15,7 +15,7 @@ let server = http.createServer((req,res) => {
 		res.end('Hello World\n');
 })
 
-server.listen(8888,() => {
+server.listen(80,() => {
 	client.startx(auth).then(async (res) => {
 		let ops;
 		while(true) {
