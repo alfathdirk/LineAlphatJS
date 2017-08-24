@@ -3,3 +3,4 @@ library
 node_modules
 thrift
 gambarunyu/
+src/bot2.js

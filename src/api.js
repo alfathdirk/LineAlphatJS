@@ -157,8 +157,27 @@ export class LineAPI {
     return this._client.cancelGroupInvitation(0,groupid,member);
   }
 
-  _acceptGroupInvitation(groupid) {
-    return this._client.acceptGroupInvitation(0,groupid);
+  async _getGroupsJoined() {
+    return await this._client.getGroupIdsJoined()
+  }
+
+  async _getGroupsInvited() {
+    return await this._client.getGroupIdsInvited()
+  }
+
+  async _acceptGroupInvitation(groupid) {
+    await this._client.acceptGroupInvitation(0,groupid);
+    await this._getGroupsInvited();
+    await this._getGroupsJoined();
+    return;
+  }
+
+  _invite(group,member) {
+    return this._client.inviteIntoGroup(0, group, member)
+  }
+
+  _getContacts(mid) {
+    return this._client.getContacts(mid)
   }
 
   async _getGroups(groupId) {
