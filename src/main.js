@@ -7,6 +7,7 @@ let exec = require('child_process').exec;
 
 const myBot = ['uc93c736a8b385208c2aa7aed58de2ceb','u236b88bf1eac2b90e848a6198152e647'];
 
+
 function isAdminOrBot(param) {
     return myBot.includes(param);
 }
@@ -17,10 +18,10 @@ class LINE extends LineAPI {
         super();
         this.receiverID = '';
         this.checkReader = [];
-    }
-
-    saveReader(group,users) {
-        redisClient.setex(group, 3600, users);
+        this.stateStatus = {
+            cancel: 0,
+            kick: 0,
+        }
     }
 
     getOprationType(operations) {
@@ -42,7 +43,7 @@ class LINE extends LineAPI {
             this.textMessage(txt,message)
         }
 
-        if(operation.type == 13) {
+        if(operation.type == 13 && this.stateStatus.cancel == 1) {
             this.cancelAll(operation.param1);
         }
 
@@ -134,6 +135,18 @@ class LINE extends LineAPI {
         })
     }
     
+    setState(seq) {
+        if(isAdminOrBot(seq.from)){
+            let [ actions , status ] = seq.text.split(' ');
+            const action = actions.toLowerCase();
+            const state = status.toLowerCase() == 'on' ? 1 : 0;
+            this.stateStatus[action] = state;
+            this._sendMessage(seq,`Status: \n${JSON.stringify(this.stateStatus)}`);
+        } else {
+            this._sendMessage(seq,`You Are Not Admin`);
+        }
+    }
+
     async recheck(cs,group) {
         let users;
         for (var i = 0; i < cs.length; i++) {
@@ -146,12 +159,12 @@ class LINE extends LineAPI {
         return contactMember.map((z) => {
                 return z.displayName;
             }).join(',');
-        // return userList;
     }
 
     async textMessage(txt, seq) {
         const messageID = seq.id;
-        if(txt == 'cancel') {
+
+        if(txt == 'cancel' && this.stateStatus.cancel == 1) {
             this.cancelAll(seq.to);
         }
 
@@ -172,7 +185,7 @@ class LINE extends LineAPI {
             })
         }
 
-        if(txt === 'kickall') {
+        if(txt === 'kickall' && this.stateStatus.kick == 1) {
             let { listMember } = await this.searchGroup(seq.to);
             for (var i = 0; i < listMember.length; i++) {
                 if(!isAdminOrBot(listMember[i].mid)){
@@ -181,8 +194,8 @@ class LINE extends LineAPI {
             }
         }
 
-        if(txt == 'set') {
-            this._sendMessage(seq, `searching...~!`);
+        if(txt == 'setpoint') {
+            this._sendMessage(seq, `SetPoint for check Reader .`);
             this.removeReaderByGroup(seq.to);
         }
 
@@ -193,7 +206,7 @@ class LINE extends LineAPI {
             
         }
 
-        if(txt == 'searching...~!') {
+        if(txt == 'setpoint for check reader .') {
             this.searchReader(seq);
         }
 
@@ -201,8 +214,19 @@ class LINE extends LineAPI {
             this.checkReader = [];
         }
 
-        if(txt == 's') {
-            console.log('xx>',this.checkReader);
+        if(txt == 'cancel on') {
+            this.setState(seq)
+        }
+
+        if(txt == 'cancel off') {
+            this.setState(seq)
+        }
+        if(txt == 'kick on') {
+            this.setState(seq)
+        }
+
+        if(txt == 'kick off') {
+            this.setState(seq)
         }
 
     }
