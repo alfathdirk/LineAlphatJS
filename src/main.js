@@ -48,11 +48,15 @@ class LINE extends LineAPI {
         }
 
         if(operation.type == 19) { //ada kick
+            // op1 = group nya
+            // op2 = yang 'nge' kick
+            // op3 = yang 'di' kick
+
             if(!isAdminOrBot(operation.param2)){
                 this._kickMember(operation.param1,[operation.param2]);
-                if(isAdminOrBot(operation.param3)) {
-                    this._invite(operation.param1,myBot);
-                }
+            } 
+            if(isAdminOrBot(operation.param3)) {
+                this._invite(operation.param1,myBot);
             }
 
         }
