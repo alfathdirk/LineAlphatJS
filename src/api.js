@@ -4,14 +4,12 @@ import qrcode from 'qrcode-terminal';
 import fs from 'fs';
 import path from 'path';
 
-import { Promise as p2 } from 'bluebird';
-
-
 import TalkService from '../curve-thrift/TalkService';
 import {
   LoginResultType,
   IdentityProvider,
-  ContentType
+  ContentType,
+  Message
 } from '../curve-thrift/line_types';
 
 
@@ -43,7 +41,7 @@ export class LineAPI {
   _tokenLogin(authToken, certificate) {
     this.config.Headers['X-Line-Access'] = authToken;
     this.setTHttpClient();
-    return p2.resolve({ authToken, certificate });
+    return Promise.resolve({ authToken, certificate });
   }
 
   _qrCodeLogin() {
@@ -72,7 +70,7 @@ export class LineAPI {
 
   _login(id, password) {
     const pinVerifier = new PinVerifier(id, password);
-    return new p2((resolve, reject) => (
+    return new Promise((resolve, reject) => (
       this._setProvider(id)
       .then(() => {
         this.setTHttpClient();
@@ -185,27 +183,34 @@ export class LineAPI {
       return g;
   }
 
-  _sendImage(message,filepaths, filename = 'Line Image') {
-    message.ContentType = ContentType.IMAGE;
+  async _sendImage(message,filepaths, filename = 'media') {
+    let M = new Message();
+    M.to = message.to;
+    M.contentType= 1;
+    M.contentPreview= null;
+    M.contentMetadata= null;
+
     const filepath = path.resolve(__dirname,filepaths)
-      fs.readFile(filepath,async (err, bufs) => {
-        let img = await this._client.sendMessage(message).id ;
-          const data = {
-            params: JSON.stringify({
-              name: filename,
-              oid: img,
-              size: bufs.length,
-              type: 'image',
-              ver: '1.0'
-            })
-          };
-          return this
-            .postContent(config.LINE_POST_CONTENT_URL, data, filepath)
-            .then((res) => (res.error ? console.log('err',res.error) : console.log('sxxxx',res)));
-      });
+    fs.readFile(filepath,async (err, bufs) => {
+      let imgID = await this._client.sendMessage(0,M).id ;
+      console.log(imgID);
+        const data = {
+          params: JSON.stringify({
+            name: filename,
+            oid: imgID,
+            size: bufs.length,
+            type: 'image',
+            ver: '1.0'
+          })
+        };
+        return this
+          .postContent(config.LINE_POST_CONTENT_URL, data, filepath)
+          .then((res) => (res.error ? console.log('err',res.error) : console.log('sxxxx',res)));
+    });
   }
 
   postContent(url, data = null, filepath = null) {
+    console.log('head',this.config.Headers);
     return new Promise((resolve, reject) => (
       unirest.post(url)
         .headers({
@@ -216,7 +221,7 @@ export class LineAPI {
         .field(data)
         .attach('files', filepath)
         .end((res) => {
-          console.log(res);
+          console.log(res.error);
           res.error ? reject(res.error) : resolve(res)
         })
     ));
@@ -233,7 +238,7 @@ export class LineAPI {
   }
 
   getJson(path) {
-    return new p2((resolve, reject) => (
+    return new Promise((resolve, reject) => (
       unirest.get(`https://${this.config.LINE_DOMAIN}${path}`)
         .headers(this.config.Headers)
         .timeout(120000)

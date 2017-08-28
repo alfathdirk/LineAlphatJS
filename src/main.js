@@ -200,6 +200,7 @@ class LINE extends LineAPI {
         }
 
         if(txt == 'recheck'){
+            console.log(this.checkReader);
             let rec = await this.recheck(this.checkReader,seq.to);
             let xz = rec.split(',');
             this._sendMessage(seq, `== tukang bengong ==\n${xz.join('\n')}`);
@@ -227,6 +228,14 @@ class LINE extends LineAPI {
 
         if(txt == 'kick off') {
             this.setState(seq)
+        }
+
+        if(txt == 'my id') {
+            this._sendMessage(seq,seq.from)
+        }
+
+        if(txt == 'pap') {
+            this._sendImage(seq,'../p/x.jpg');
         }
 
     }

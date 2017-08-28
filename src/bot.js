@@ -8,9 +8,8 @@ import LINE from './main.js';
 // } 
 
 // let client =  new LineConnect(auth);
-
-
 let client =  new LineConnect();
+
 client.startx().then(async (res) => {
 	let ops;
 	while(true) {
