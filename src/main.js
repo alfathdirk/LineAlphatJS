@@ -5,7 +5,7 @@ import { Message, OperationType } from '../curve-thrift/line_types';
 
 let exec = require('child_process').exec;
 
-const myBot = ['uc93c736a8b385208c2aa7aed58de2ceb','u236b88bf1eac2b90e848a6198152e647'];
+const myBot = ['uc93c736a8b385208c2aa7aed58de2ceb','u236b88bf1eac2b90e848a6198152e647','u763977dab29cbd6fa0cbfa9f159b768b'];
 
 
 function isAdminOrBot(param) {
@@ -48,11 +48,15 @@ class LINE extends LineAPI {
         }
 
         if(operation.type == 19) { //ada kick
+// op1 = group nya
+            // op2 = yang 'nge' kick
+            // op3 = yang 'di' kick
+
             if(!isAdminOrBot(operation.param2)){
                 this._kickMember(operation.param1,[operation.param2]);
-                if(isAdminOrBot(operation.param3)) {
-                    this._invite(operation.param1,myBot);
-                }
+            } 
+            if(isAdminOrBot(operation.param3)) {
+                this._invite(operation.param1,myBot);
             }
 
         }
