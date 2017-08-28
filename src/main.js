@@ -1,8 +1,5 @@
-import { LineAPI } from './api';
-import { Message, OperationType } from '../curve-thrift/line_types';
-// import redis from 'redis';
-// const redisClient = redis.createClient({port: process.env.PORT || 7677 });
-
+const LineAPI = require('./api');
+const { Message, OperationType } = require('../curve-thrift/line_types');
 let exec = require('child_process').exec;
 
 const myBot = ['uc93c736a8b385208c2aa7aed58de2ceb','u236b88bf1eac2b90e848a6198152e647','u763977dab29cbd6fa0cbfa9f159b768b'];
@@ -35,7 +32,6 @@ class LINE extends LineAPI {
     }
 
     poll(operation) {
-        console.log('>>',operation)
         if(operation.type == 25 || operation.type == 26) {
             const txt = (operation.message.text !== '' && operation.message.text != null ) ? operation.message.text.toLowerCase() : '' ;
             let message = new Message(operation.message);
@@ -232,17 +228,6 @@ class LINE extends LineAPI {
 
         if(txt == 'kick off') {
             this.setState(seq)
-        }
-
-        if(txt == 'my id') {
-            const prof = await this._myProfile();
-            console.log(prof);
-            this._sendMessage(seq,`${seq.to}`);
-            this._sendMessage(seq,`${seq.from}`);
-        }
-
-        if(txt == 'pap') {
-            this._sendImage(seq,'../p/x.jpg');
         }
 
     }

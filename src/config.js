@@ -1,8 +1,8 @@
-import { hostname, platform } from 'os';
+const { hostname, platform } = require('os');
 
 const whichPlatform = platform() === 'darwin' ? 'MAC' : 'win32';
 
-export const config = {
+const config = {
   LINE_DOMAIN: 'gd2.line.naver.jp',
   LINE_OS_URL: 'os.line.naver.jp',
   LINE_HTTP_URL: '/api/v4/TalkService.do',
@@ -24,3 +24,5 @@ export const config = {
     'User-Agent': 'LINE for Alfath'
   }
 };
+
+module.exports = config;

@@ -1,22 +1,22 @@
-import thrift from 'thrift-http';
-import unirest from 'unirest';
-import qrcode from 'qrcode-terminal';
-import fs from 'fs';
-import path from 'path';
+const thrift = require('thrift-http');
+const unirest = require('unirest');
+const qrcode = require('qrcode-terminal');
+const fs = require('fs');
+const path = require('path');
 
-import TalkService from '../curve-thrift/TalkService';
-import {
+const TalkService = require('../curve-thrift/TalkService');
+const {
   LoginResultType,
   IdentityProvider,
   ContentType,
   Message
-} from '../curve-thrift/line_types';
+} = require('../curve-thrift/line_types');
 
 
-import { PinVerifier } from './pinVerifier';
-import { config } from './config';
+const PinVerifier = require('./pinVerifier');
+const config = require('./config');
 
-export class LineAPI {
+class LineAPI {
   constructor() {
     this.config = config;
     this.setTHttpClient();
@@ -251,3 +251,5 @@ export class LineAPI {
     ));
   }
 }
+
+module.exports = LineAPI;

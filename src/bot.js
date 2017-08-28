@@ -1,14 +1,14 @@
-import { LineConnect } from './connect';
-import LINE from './main.js';
+const LineConnect = require('./connect');
+let LINE = require('./main.js');
 
-//using auth token
+// //using auth token
  let auth = {
- 	authToken: 'Ek7i6aodDSc4NTJGzOsb.YtXZAOS4uGJcQNRTwn4S6W.18zbsyCGN7SC8YGmmbuV1wXiIZjNW/WqItbNZ39qpOU=',
- 	certificate: 'c7af8d3647546200e737675ba09ad944898803873f8f32f32c56661c906c2b10',
+ 	authToken: 'EkdIeTLip4h8235aAjj7.i2UiVX6Sk5dOskyzGvlMrW.kKm08oTE6oodnQjWHfgxQMVjkxmTOXPfGp5Sj1Y1rsI=',
+ 	certificate: '9b1b7010d143afe9867b82f15ccbf119229ef775cfc3bf81973dabd6c4d5d2d5',
  } 
 
 let client =  new LineConnect(auth);
-//let client =  new LineConnect();
+// let client =  new LineConnect();
 
 client.startx().then(async (res) => {
 	let ops;

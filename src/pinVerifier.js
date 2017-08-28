@@ -1,7 +1,7 @@
-import utf8 from 'utf8';
-import RSA from 'node-bignumber';
+const utf8 = require('utf8');
+const RSA = require('node-bignumber');
 
-export class PinVerifier {
+class PinVerifier {
   constructor(id, password) {
     this.id = id;
     this.password = password;
@@ -21,3 +21,6 @@ export class PinVerifier {
     return { keyname, credentials, message };
   }
 }
+
+
+module.exports = PinVerifier;

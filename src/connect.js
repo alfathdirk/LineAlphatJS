@@ -1,6 +1,6 @@
-import { LineAPI } from './api';
+const LineAPI  = require('./api');
 
-export class LineConnect extends LineAPI {
+class LineConnect extends LineAPI {
 
   constructor(options) {
     super();
@@ -73,3 +73,5 @@ export class LineConnect extends LineAPI {
   }
 
 }
+
+module.exports = LineConnect;
