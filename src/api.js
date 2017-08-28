@@ -159,6 +159,9 @@ export class LineAPI {
     return await this._client.getGroupIdsJoined()
   }
 
+  async _myProfile() {
+    return await this._client.getProfile();
+  }
   async _getGroupsInvited() {
     return await this._client.getGroupIdsInvited()
   }

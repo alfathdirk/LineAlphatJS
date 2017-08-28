@@ -5,7 +5,7 @@ import { Message, OperationType } from '../curve-thrift/line_types';
 
 let exec = require('child_process').exec;
 
-const myBot = ['uc93c736a8b385208c2aa7aed58de2ceb','u236b88bf1eac2b90e848a6198152e647'];
+const myBot = ['uc93c736a8b385208c2aa7aed58de2ceb','u236b88bf1eac2b90e848a6198152e647','u763977dab29cbd6fa0cbfa9f159b768b'];
 
 
 function isAdminOrBot(param) {
@@ -35,6 +35,7 @@ class LINE extends LineAPI {
     }
 
     poll(operation) {
+        console.log('>>',operation)
         if(operation.type == 25 || operation.type == 26) {
             const txt = (operation.message.text !== '' && operation.message.text != null ) ? operation.message.text.toLowerCase() : '' ;
             let message = new Message(operation.message);
@@ -51,13 +52,12 @@ class LINE extends LineAPI {
             // op1 = group nya
             // op2 = yang 'nge' kick
             // op3 = yang 'di' kick
-
+            if(isAdminOrBot(operation.param3)) {
+                this._invite(operation.param1,[operation.param3]);
+            }
             if(!isAdminOrBot(operation.param2)){
                 this._kickMember(operation.param1,[operation.param2]);
             } 
-            if(isAdminOrBot(operation.param3)) {
-                this._invite(operation.param1,myBot);
-            }
 
         }
 
@@ -235,7 +235,10 @@ class LINE extends LineAPI {
         }
 
         if(txt == 'my id') {
-            this._sendMessage(seq,seq.from)
+            const prof = await this._myProfile();
+            console.log(prof);
+            this._sendMessage(seq,`${seq.to}`);
+            this._sendMessage(seq,`${seq.from}`);
         }
 
         if(txt == 'pap') {

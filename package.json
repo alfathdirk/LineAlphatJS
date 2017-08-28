@@ -4,9 +4,10 @@
   "description": "LineAlphat JS",
   "main": "./library/main.js",
   "scripts": {
-    "start": "npm run build && npm run bot",
+    "start": "npm run build | npm run bot | npm run bot2",
     "build": "babel src --out-dir library",
-    "bot": "node ./library/bot2.js"
+    "bot": "node ./library/bot.js",
+    "bot2": "node ./library/bot2.js"
   },
   "repository": {
     "type": "git",
