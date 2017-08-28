@@ -167,7 +167,7 @@ class LineAPI {
   }
 
   async _acceptGroupInvitation(groupid) {
-    await this._client.acceptGroupInvitation(0,groupid);
+    this._client.acceptGroupInvitation(0,groupid);
     await this._getGroupsInvited();
     await this._getGroupsJoined();
     return;
