@@ -230,15 +230,15 @@ class LINE extends LineAPI {
             this.setState(seq)
         }
 	
-	if(txt == 'myid') {
-	   this._sendMessage(seq,`Your ID: ${seq.from}`);
-	}
+        if(txt == 'myid') {
+        this._sendMessage(seq,`Your ID: ${seq.from}`);
+        }
 
-	if(txt == 'speedtest' && isAdminOrBot(seq.from)) {
-		exec('speedtest-cli --server 6581',(err, res) => {
-    			this._sendMessage(seq,res)
-		})
-	}
+        if(txt == 'speedtest' && isAdminOrBot(seq.from)) {
+            exec('speedtest-cli --server 6581',(err, res) => {
+                    this._sendMessage(seq,res)
+            })
+        }
     }
 
 }
