@@ -3,4 +3,5 @@ library
 node_modules
 thrift
 gambarunyu/
-src/bot2.js
+src/bot.js
+src/renew.js
