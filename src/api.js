@@ -60,7 +60,6 @@ class LineAPI {
           .headers(this.config.Headers)
           .timeout(120000)
           .end(async (res) => {
-            console.log(res);
             const verifiedQr = res.body.result.verifier;
             const { authToken, certificate } =
               await this._client.loginWithVerifierForCerificate(verifiedQr);
@@ -86,7 +85,6 @@ class LineAPI {
               this.provider, rsaCrypto.keyname, rsaCrypto.credentials,
               true, this.config.ip, 'purple-line', '',
               (err, result) => {
-                console.log
                 if (err) {
                   console.log('LoginFailed');
                   console.error(err);
