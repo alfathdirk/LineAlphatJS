@@ -5,16 +5,10 @@ class LineConnect extends LineAPI {
   constructor(options) {
     super();
 
-    this.config.Headers['X-Line-Application'] =
-      'IOSIPAD 6.0.0 iPhone OS 9.0.2';
-    this.config.Headers['X-Line-Access'] = '';
-      
     if (typeof options !== 'undefined') {
       this.authToken = options.authToken;
       this.certificate = options.certificate;
       this.config.Headers['X-Line-Access'] = options.authToken;
-    } else {
-     
     }
   }
   
@@ -23,14 +17,14 @@ class LineConnect extends LineAPI {
       this._qrCodeLogin().then(async (res) => {
         this.authToken = res.authToken;
         this.certificate = res.certificate;
-        console.log(`[*] Token: ${this.authToken}`);
-        console.log(`[*] Certificate: ${res.certificate}\n`);
+        console.info(`[*] Token: ${this.authToken}`);
+        console.info(`[*] Certificate: ${res.certificate}\n`);
         let { mid, displayName } = await this._client.getProfile();
-        console.log(`[*] mid: ${mid}\n`);
-        console.log(`[*] Name: ${displayName}\n`);
-        console.log(`NOTE: Dont forget , put your mid and admin on variable 'myBot' in main.js \n`);
-        console.log(`Regrads Alfathdirk and thx for TCR Team \n`);
-        console.log(`=======BOT RUNNING======\n`);
+        console.info(`[*] mid: ${mid}\n`);
+        console.info(`[*] Name: ${displayName}\n`);
+        console.info(`NOTE: Dont forget , put your mid and admin on variable 'myBot' in main.js \n`);
+        console.info(`Regrads Alfathdirk and thx for TCR Team \n`);
+        console.info(`=======BOT RUNNING======\n`);
         await this._tokenLogin(this.authToken, this.certificate);
         resolve();
       });

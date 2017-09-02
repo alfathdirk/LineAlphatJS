@@ -26,8 +26,10 @@ class LineAPI {
     protocol: thrift.TCompactProtocol,
     transport: thrift.TBufferedTransport,
     headers: this.config.Headers,
-    path: this.config.LINE_HTTP_URL
+    path: this.config.LINE_HTTP_URL,
+    https: true
   }) {
+    options.headers['X-Line-Application'] = 'DESKTOPMAC 10.10.2-YOSEMITE-x64 MAC 4.5.0';
     this.options = options;
     this.connection =
       thrift.createHttpConnection(this.config.LINE_DOMAIN, 443, this.options);
@@ -36,6 +38,7 @@ class LineAPI {
       return err;
     });
     this._client = thrift.createHttpClient(TalkService, this.connection);
+    
   }
 
   _tokenLogin(authToken, certificate) {
@@ -48,14 +51,16 @@ class LineAPI {
     this.setTHttpClient();
     return new Promise((resolve, reject) => {
     this._client.getAuthQrcode(true, 'Alfathdirk-PC',(err, result) => {
+      // console.log('here')
       const qrcodeUrl = `line://au/q/${result.verifier}`;
       qrcode.generate(qrcodeUrl,{small: true});
-      console.log(`\n\nlink qr code is: ${qrcodeUrl}`)
+      console.info(`\n\nlink qr code is: ${qrcodeUrl}`)
       Object.assign(this.config.Headers,{ 'X-Line-Access': result.verifier });
-        unirest.get('http://gd2.line.naver.jp/Q')
+        unirest.get('https://gd2.line.naver.jp/Q')
           .headers(this.config.Headers)
           .timeout(120000)
           .end(async (res) => {
+            console.log(res);
             const verifiedQr = res.body.result.verifier;
             const { authToken, certificate } =
               await this._client.loginWithVerifierForCerificate(verifiedQr);
@@ -64,7 +69,7 @@ class LineAPI {
             this.setTHttpClient(this.options);
             resolve({ authToken, certificate });
           });
-    });
+      });
     });
   }
 
@@ -81,12 +86,12 @@ class LineAPI {
               this.provider, rsaCrypto.keyname, rsaCrypto.credentials,
               true, this.config.ip, 'purple-line', '',
               (err, result) => {
+                console.log
                 if (err) {
                   console.log('LoginFailed');
                   console.error(err);
                   return reject(err);
                 }
-                console.log(result);
                 this._client.pinCode = result.pinCode;
                 this.alertOrConsoleLog(
                   `Enter Pincode ${result.pinCode}
@@ -177,13 +182,24 @@ class LineAPI {
     return this._client.inviteIntoGroup(0, group, member)
   }
 
+  async _updateGroup(group) {
+    return await this._client.updateGroup(0, group)
+  }
+
   _getContacts(mid) {
     return this._client.getContacts(mid)
   }
 
   async _getGroups(groupId) {
-      const g = await this._client.getGroups(groupId);
-      return g;
+      return await this._client.getGroups(groupId);
+  }
+
+  async _getGroup(groupId) {
+    return await this._client.getGroup(groupId);
+  }
+
+  async _reissueGroupTicket(groupId) {
+    return await this._client.reissueGroupTicket(groupId);
   }
 
   async _sendImage(message,filepaths, filename = 'media') {
@@ -231,8 +247,7 @@ class LineAPI {
   }
   
   _fetchOperations(revision, count = 5) {
-    this.options.path = this.config.LINE_POLL_URL
-    this.setTHttpClient();
+    // this.options.path = this.config.LINE_POLL_URL
     return this._client.fetchOperations(revision, count);
   }
 

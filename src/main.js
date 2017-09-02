@@ -1,5 +1,5 @@
 const LineAPI = require('./api');
-const { Message, OperationType } = require('../curve-thrift/line_types');
+const { Message, OpType, Location } = require('../curve-thrift/line_types');
 let exec = require('child_process').exec;
 
 const myBot = ['u78b179f959eba71ec2de09233281c49e','uc93c736a8b385208c2aa7aed58de2ceb','u236b88bf1eac2b90e848a6198152e647','u763977dab29cbd6fa0cbfa9f159b768b'];
@@ -22,10 +22,10 @@ class LINE extends LineAPI {
     }
 
     getOprationType(operations) {
-        for (let key in OperationType) {
-            if(operations.type == OperationType[key]) {
+        for (let key in OpType) {
+            if(operations.type == OpType[key]) {
                 if(key !== 'NOTIFIED_UPDATE_PROFILE') {
-                    console.log(`[* ${operations.type} ] ${key} `);
+                    console.info(`[* ${operations.type} ] ${key} `);
                 }
             }
         }
@@ -57,22 +57,25 @@ class LINE extends LineAPI {
 
         }
 
-        if(operation.type == 28){ //ada reader
-            let checkReader = this.checkReader;
-            for (let i = 0; i < checkReader.length; i++) {
-                for (let key in checkReader[i]) {
-                    let oparam2 = operation.param2.split('\u001e');
-                    if(oparam2.includes(checkReader[i].messageId)) {
-                        let usersList = checkReader[i].users;
-                        let timeList = checkReader[i].timeSeen;
-                        if(!usersList.includes(operation.param1)){
-                            usersList.push(operation.param1);
-                            timeList.push(operation.createdTime.toString());
+        if(operation.type == 55){ //ada reader
+
+            const idx = this.checkReader.findIndex((v) => {
+                if(v.group == operation.param1) {
+                    return v
+                }
+            })
+            if(this.checkReader.length < 1 || idx == -1) {
+                this.checkReader.push({ group: operation.param1, users: [operation.param2], timeSeen: [operation.param3] });
+            } else {
+                for (var i = 0; i < this.checkReader.length; i++) {
+                    if(this.checkReader[i].group == operation.param1) {
+                        if(!this.checkReader[i].users.includes(operation.param2)) {
+                            this.checkReader[i].users.push(operation.param2);
+                            this.checkReader[i].timeSeen.push(operation.param3);
                         }
                     }
-                }                
+                }
             }
-            
         }
 
         if(operation.type == 13) { // diinvite
@@ -83,21 +86,6 @@ class LINE extends LineAPI {
             }
         }
         this.getOprationType(operation);
-    }
-
-    searchReader(seq) {
-        const messageID = seq.id;
-        let groupID = seq.to;
-        let dataReader = { 
-            messageId: messageID,
-            group: groupID,
-            users: [],
-            timeSeen: [],
-        };
-
-        if(myBot.includes('uc93c736a8b385208c2aa7aed58de2ceb')) {
-            this.checkReader.push(dataReader);
-        }
     }
 
     async cancelAll(gid) {
@@ -125,16 +113,6 @@ class LINE extends LineAPI {
         }
     }
 
-    removeReaderByGroup(groupID) {
-        let i = 0;
-        this.checkReader.map((v) => {
-            if(v.group == groupID) {
-                this.checkReader.splice(i,1);
-            }
-            i++
-        })
-    }
-    
     setState(seq) {
         if(isAdminOrBot(seq.from)){
             let [ actions , status ] = seq.text.split(' ');
@@ -154,14 +132,27 @@ class LINE extends LineAPI {
                 users = cs[i].users;
             }
         }
-
+        
         let contactMember = await this._getContacts(users);
         return contactMember.map((z) => {
                 return z.displayName;
-            }).join(',');
+            });
+    }
+
+    removeReaderByGroup(groupID) {
+        const groupIndex = this.checkReader.findIndex(v => {
+            if(v.group == groupID) {
+                return v
+            }
+        })
+
+        if(groupIndex != -1) {
+            this.checkReader.splice(groupIndex,1);
+        }
     }
 
     async textMessage(txt, seq) {
+        const [ cmd, payload ] = txt.split(' ');
         const messageID = seq.id;
 
         if(txt == 'cancel' && this.stateStatus.cancel == 1) {
@@ -185,7 +176,7 @@ class LINE extends LineAPI {
             })
         }
 
-        if(txt === 'kickall' && this.stateStatus.kick == 1) {
+        if(txt === 'kickall' && this.stateStatus.kick == 1 && isAdminOrBot(seq.from)) {
             let { listMember } = await this.searchGroup(seq.to);
             for (var i = 0; i < listMember.length; i++) {
                 if(!isAdminOrBot(listMember[i].mid)){
@@ -195,15 +186,17 @@ class LINE extends LineAPI {
         }
 
         if(txt == 'setpoint') {
-            this._sendMessage(seq, `SetPoint for check Reader .`);
+            this._sendMessage(seq, `SetPoint for check Reader.`);
             this.removeReaderByGroup(seq.to);
         }
 
+        if(txt == 'clear') {
+            this.checkReader = []
+        }  
+
         if(txt == 'recheck'){
-            console.log(this.checkReader);
             let rec = await this.recheck(this.checkReader,seq.to);
-            let xz = rec.split(',');
-            this._sendMessage(seq, `== tukang bengong ==\n${xz.join('\n')}`);
+            this._sendMessage(seq, `== tukang bengong ==\n${rec.join('\n')}`);
             
         }
 
@@ -237,6 +230,50 @@ class LINE extends LineAPI {
         if(txt == 'speedtest' && isAdminOrBot(seq.from)) {
             exec('speedtest-cli --server 6581',(err, res) => {
                     this._sendMessage(seq,res)
+            })
+        }
+
+        const joinByUrl = ['ourl','curl'];
+        if(joinByUrl.includes(txt)) {
+            this._sendMessage(seq,`Updating group ...`);
+            let updateGroup = await this._getGroup(seq.to);
+            updateGroup.preventJoinByTicket = true;
+            if(txt == 'ourl') {
+                updateGroup.preventJoinByTicket = false;
+                const groupUrl = await this._reissueGroupTicket(seq.to)
+                this._sendMessage(seq,`Line group = line://ti/g/${groupUrl}`);
+            }
+            await this._updateGroup(updateGroup);
+        }
+
+        if(cmd === 'ip') {
+            exec(`curl ipinfo.io/${payload}`,(err, res) => {
+                const result = JSON.parse(res);
+                if(typeof result.error == 'undefined') {
+                    const { org, country, loc, city, region } = result;
+                    try {
+                        const [latitude, longitude ] = loc.split(',');
+                        let location = new Location();
+                        Object.assign(location,{ 
+                            title: `Location:`,
+                            address: `${org} ${city} [ ${region} ]\n${payload}`,
+                            latitude: latitude,
+                            longitude: longitude,
+                            phone: null 
+                        })
+                        const Obj = { 
+                            text: 'Location',
+                            location : location,
+                            contentType: 0,
+                        }
+                        Object.assign(seq,Obj)
+                        this._sendMessage(seq,'Location');
+                    } catch (err) {
+                        this._sendMessage(seq,'Not Found');
+                    }
+                } else {
+                    this._sendMessage(seq,'Location Not Found , Maybe di dalem goa');
+                }
             })
         }
     }
