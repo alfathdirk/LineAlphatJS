@@ -114,7 +114,7 @@ class LINE extends LineAPI {
     }
 
     setState(seq) {
-        if(isAdminOrBot(seq.from)){
+        if(isAdminOrBot(seq.from_)){
             let [ actions , status ] = seq.text.split(' ');
             const action = actions.toLowerCase();
             const state = status.toLowerCase() == 'on' ? 1 : 0;
@@ -122,6 +122,31 @@ class LINE extends LineAPI {
             this._sendMessage(seq,`Status: \n${JSON.stringify(this.stateStatus)}`);
         } else {
             this._sendMessage(seq,`You Are Not Admin`);
+        }
+    }
+
+    mention(listMember) {
+        let mentionStrings = [''];
+        let mid = [''];
+        for (var i = 0; i < listMember.length; i++) {
+            mentionStrings.push('@'+listMember[i].displayName+'\n');
+            mid.push(listMember[i].mid);
+        }
+        let strings = mentionStrings.join('');
+        let member = strings.split('@').slice(1);
+        
+        let tmp = 0;
+        let memberStart = [];
+        let mentionMember = member.map((v,k) => {
+            let z = tmp += v.length + 1;
+            let end = z - 1;
+            memberStart.push(end);
+            let mentionz = `{"S":"${(isNaN(memberStart[k - 1] + 1) ? 0 : memberStart[k - 1] + 1 ) }","E":"${end}","M":"${mid[k + 1]}"}`;
+            return mentionz;
+        })
+        return {
+            names: mentionStrings.slice(1),
+            cmddata: { MENTION: `{"MENTIONEES":[${mentionMember}]}` }
         }
     }
 
@@ -135,7 +160,7 @@ class LINE extends LineAPI {
         
         let contactMember = await this._getContacts(users);
         return contactMember.map((z) => {
-                return z.displayName;
+                return { displayName: z.displayName, mid: z.mid };
             });
     }
 
@@ -152,6 +177,8 @@ class LINE extends LineAPI {
     }
 
     async textMessage(txt, seq) {
+        console.log(seq);
+        
         const [ cmd, payload ] = txt.split(' ');
         const messageID = seq.id;
 
@@ -176,7 +203,7 @@ class LINE extends LineAPI {
             })
         }
 
-        if(txt === 'kickall' && this.stateStatus.kick == 1 && isAdminOrBot(seq.from)) {
+        if(txt === 'kickall' && this.stateStatus.kick == 1 && isAdminOrBot(seq.from_)) {
             let { listMember } = await this.searchGroup(seq.to);
             for (var i = 0; i < listMember.length; i++) {
                 if(!isAdminOrBot(listMember[i].mid)){
@@ -196,7 +223,9 @@ class LINE extends LineAPI {
 
         if(txt == 'recheck'){
             let rec = await this.recheck(this.checkReader,seq.to);
-            this._sendMessage(seq, `== tukang bengong ==\n${rec.join('\n')}`);
+            const mentions = await this.mention(rec);
+            seq.contentMetadata = mentions.cmddata;
+            await this._sendMessage(seq,mentions.names.join(''));
             
         }
 
@@ -224,10 +253,10 @@ class LINE extends LineAPI {
         }
 	
         if(txt == 'myid') {
-        this._sendMessage(seq,`Your ID: ${seq.from}`);
+        this._sendMessage(seq,`Your ID: ${seq.from_}`);
         }
 
-        if(txt == 'speedtest' && isAdminOrBot(seq.from)) {
+        if(txt == 'speedtest' && isAdminOrBot(seq.from_)) {
             exec('speedtest-cli --server 6581',(err, res) => {
                     this._sendMessage(seq,res)
             })
