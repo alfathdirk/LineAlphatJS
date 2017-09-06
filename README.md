@@ -1,6 +1,6 @@
 Line Alphat JS
 
-# require node >= v6
+# require node >= v8.x.x
 check your nodejs version
 `node -v`
 [upgrade nodejs](https://google.com/)
