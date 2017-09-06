@@ -177,7 +177,6 @@ class LINE extends LineAPI {
     }
 
     async textMessage(txt, seq) {
-        console.log(seq);
         
         const [ cmd, payload ] = txt.split(' ');
         const messageID = seq.id;
