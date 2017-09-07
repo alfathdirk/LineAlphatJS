@@ -33,7 +33,7 @@ class LINE extends LineAPI {
 
     poll(operation) {
         if(operation.type == 25 || operation.type == 26) {
-            const txt = (operation.message.text !== '' && operation.message.text != null ) ? operation.message.text.toLowerCase() : '' ;
+            const txt = (operation.message.text !== '' && operation.message.text != null ) ? operation.message.text : '' ;
             let message = new Message(operation.message);
             this.receiverID = message.to = (operation.message.to === myBot[0]) ? operation.message.from_ : operation.message.to ;
             Object.assign(message,{ ct: operation.createdTime.toString() });
@@ -176,9 +176,9 @@ class LINE extends LineAPI {
         }
     }
 
-    async textMessage(txt, seq) {
-        
-        const [ cmd, payload ] = txt.split(' ');
+    async textMessage(textMessages, seq) {
+        const [ cmd, payload ] = textMessages.split(' ');
+        const txt = textMessages.toLowerCase();
         const messageID = seq.id;
 
         if(txt == 'cancel' && this.stateStatus.cancel == 1) {
@@ -262,6 +262,12 @@ class LINE extends LineAPI {
                 this._sendMessage(seq,`Line group = line://ti/g/${groupUrl}`);
             }
             await this._updateGroup(updateGroup);
+        }
+
+        if(cmd == 'join') {
+            const [ ticketId ] = payload.split('g/').splice(-1);
+            let { id } = await this._findGroupByTicket(ticketId);
+            await this._acceptGroupInvitationByTicket(id,ticketId);
         }
 
         if(cmd === 'ip') {

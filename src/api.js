@@ -200,6 +200,14 @@ class LineAPI {
     return await this._client.reissueGroupTicket(groupId);
   }
 
+  async _findGroupByTicket(ticketID){
+    return await this._client.findGroupByTicket(ticketID);
+  }
+  
+  async _acceptGroupInvitationByTicket(gid,ticketID){
+    return await this._client.acceptGroupInvitationByTicket(0,gid,ticketID);
+  }
+
   async _sendImage(message,filepaths, filename = 'media') {
     let M = new Message();
     M.to = message.to;
