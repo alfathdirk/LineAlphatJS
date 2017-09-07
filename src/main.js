@@ -212,12 +212,13 @@ class LINE extends LineAPI {
         }
 
         if(txt == 'setpoint') {
-            this._sendMessage(seq, `SetPoint for check Reader.`);
+            this._sendMessage(seq, `Setpoint for check reader.`);
             this.removeReaderByGroup(seq.to);
         }
 
         if(txt == 'clear') {
             this.checkReader = []
+            this._sendMessage(seq, `Remove all check reader on memory`);
         }  
 
         if(txt == 'recheck'){
