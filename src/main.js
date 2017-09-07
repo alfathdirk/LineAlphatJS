@@ -236,23 +236,13 @@ class LINE extends LineAPI {
             this.checkReader = [];
         }
 
-        if(txt == 'cancel on') {
-            this.setState(seq)
-        }
-
-        if(txt == 'cancel off') {
-            this.setState(seq)
-        }
-        if(txt == 'kick on') {
-            this.setState(seq)
-        }
-
-        if(txt == 'kick off') {
+        const action = ['cancel on','cancel off','kick on','kick off']
+        if(action.includes(txt)) {
             this.setState(seq)
         }
 	
         if(txt == 'myid') {
-        this._sendMessage(seq,`Your ID: ${seq.from_}`);
+            this._sendMessage(seq,`Your ID: ${seq.from_}`);
         }
 
         if(txt == 'speedtest' && isAdminOrBot(seq.from_)) {
