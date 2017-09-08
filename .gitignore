@@ -3,7 +3,6 @@ library
 node_modules
 thrift
 gambarunyu/
-src/bo*
 src/renew.js
 list.txt
 line.thrift
