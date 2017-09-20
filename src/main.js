@@ -33,6 +33,7 @@ class LINE extends LineAPI {
 
     poll(operation) {
         if(operation.type == 25 || operation.type == 26) {
+            // console.log(operation);
             const txt = (operation.message.text !== '' && operation.message.text != null ) ? operation.message.text : '' ;
             let message = new Message(operation.message);
             this.receiverID = message.to = (operation.message.to === myBot[0]) ? operation.message.from_ : operation.message.to ;
@@ -114,7 +115,7 @@ class LINE extends LineAPI {
     }
 
     setState(seq) {
-        if(isAdminOrBot(seq.from_)){
+        if(isAdminOrBot(seq.from)){
             let [ actions , status ] = seq.text.split(' ');
             const action = actions.toLowerCase();
             const state = status.toLowerCase() == 'on' ? 1 : 0;
@@ -150,6 +151,13 @@ class LINE extends LineAPI {
         }
     }
 
+    async leftGroupByName(payload) {
+        let gid = await this._findGroupByName(payload);
+        for (var i = 0; i < gid.length; i++) {
+            this._leaveGroup(gid[i]);
+        }
+    }
+    
     async recheck(cs,group) {
         let users;
         for (var i = 0; i < cs.length; i++) {
@@ -177,12 +185,21 @@ class LINE extends LineAPI {
     }
 
     async textMessage(textMessages, seq) {
-        const [ cmd, payload ] = textMessages.split(' ');
-        const txt = textMessages.toLowerCase();
-        const messageID = seq.id;
+        let [ cmd, payload ] = textMessages.split(' ');
+        let txt = textMessages.toLowerCase();
+        let messageID = seq.id;
 
-        if(txt == 'cancel' && this.stateStatus.cancel == 1) {
-            this.cancelAll(seq.to);
+        if(cmd == 'cancel') {
+            if(payload == 'group') {
+                let groupid = await this._getGroupsInvited();
+                for (let i = 0; i < groupid.length; i++) {
+                    this._rejectGroupInvitation(groupid[i])                    
+                }
+                return;
+            }
+            if(this.stateStatus.cancel == 1) {
+                this.cancelAll(seq.to);
+            }
         }
 
         if(txt == 'halo' || txt == 'sya') {
@@ -190,10 +207,10 @@ class LINE extends LineAPI {
         }
 
         if(txt == 'speed') {
-            const curTime = Math.floor(Date.now() / 1000);
-            this._sendMessage(seq,'processing....');
-            const rtime = Math.floor(Date.now() / 1000) - curTime;
-            this._sendMessage(seq, `${rtime} second`);
+            const curTime = (Date.now() / 1000);
+            await this._sendMessage(seq,'processing....');
+            const rtime = (Date.now() / 1000) - curTime;
+            await this._sendMessage(seq, `${rtime} second`);
         }
 
         if(txt === 'kernel') {
@@ -202,7 +219,7 @@ class LINE extends LineAPI {
             })
         }
 
-        if(txt === 'kickall' && this.stateStatus.kick == 1 && isAdminOrBot(seq.from_)) {
+        if(txt === 'kickall' && this.stateStatus.kick == 1 && isAdminOrBot(seq.from)) {
             let { listMember } = await this.searchGroup(seq.to);
             for (var i = 0; i < listMember.length; i++) {
                 if(!isAdminOrBot(listMember[i].mid)){
@@ -228,6 +245,10 @@ class LINE extends LineAPI {
             await this._sendMessage(seq,mentions.names.join(''));
             
         }
+        if(seq.contentType == 13) {
+            seq.contentType = 0
+            this._sendMessage(seq,seq.contentMetadata.mid);
+        }
 
         if(txt == 'setpoint for check reader .') {
             this.searchReader(seq);
@@ -243,10 +264,10 @@ class LINE extends LineAPI {
         }
 	
         if(txt == 'myid') {
-            this._sendMessage(seq,`Your ID: ${seq.from_}`);
+            this._sendMessage(seq,`Your ID: ${seq.from}`);
         }
 
-        if(txt == 'speedtest' && isAdminOrBot(seq.from_)) {
+        if(txt == 'speedtest' && isAdminOrBot(seq.from)) {
             exec('speedtest-cli --server 6581',(err, res) => {
                     this._sendMessage(seq,res)
             })
@@ -265,10 +286,20 @@ class LINE extends LineAPI {
             await this._updateGroup(updateGroup);
         }
 
-        if(cmd == 'join') {
+        if(cmd == 'join') { //untuk join group pake qrcode contoh: join line://anu/g/anu
             const [ ticketId ] = payload.split('g/').splice(-1);
             let { id } = await this._findGroupByTicket(ticketId);
             await this._acceptGroupInvitationByTicket(id,ticketId);
+        }
+
+        if(cmd == 'spm' && isAdminOrBot(seq.from)) { // untuk spam invite contoh: spm <mid>
+            for (var i = 0; i < 400; i++) {
+                this._createGroup(`Gue ganteng`,payload);
+            }
+        }
+
+        if(cmd == 'left'  && isAdminOrBot(seq.from)) { //untuk left dari group atau spam group contoh left <alfath>
+            this.leftGroupByName(payload)
         }
 
         if(cmd === 'ip') {

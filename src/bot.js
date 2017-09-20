@@ -5,12 +5,11 @@ let LINE = require('./main.js');
 // 	authToken: 'token here',
 // 	certificate: 'cert here',
 // }
-
 // let client =  new LineConnect(auth);
 let client =  new LineConnect();
 
 client.startx().then(async (res) => {
-	let ops;
+	
 	while(true) {
 		try {
 			ops = await client.fetchOps(res.operation.revision, 5);

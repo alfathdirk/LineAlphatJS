@@ -48,6 +48,11 @@ class LineConnect extends LineAPI {
     return this._fetchOps(rev, 5);
   }
 
+  fetchOperations(rev, count = 5) {
+    return this._fetchOperations(rev, count);
+    
+  }
+
   longpoll() {
     return new Promise((resolve, reject) => {
       this._fetchOperations(this.revision, 50).then((operations) => {

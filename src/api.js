@@ -162,17 +162,48 @@ class LineAPI {
     return await this._client.getGroupIdsJoined()
   }
 
+  async _getGroupsInvited() {
+    return await this._client.getGroupIdsInvited();
+  }
+
   async _myProfile() {
     return await this._client.getProfile();
   }
-  async _getGroupsInvited() {
-    return await this._client.getGroupIdsInvited()
+
+  _inviteIntoGroup(group,memid) {
+    return this._client.inviteIntoGroup(0,group,memid);
+  }
+
+  async _findGroupByName(name) {
+    let group = [];
+    let groupID = await this._getGroupsJoined();
+    let groups = await this._getGroups(groupID);
+    for (let key in groups) {
+        if(groups[key].name === name){
+          group.push(groups[key].id);
+        }
+    }
+    return group;
+
+  }
+
+  async _refrehGroup() {
+    await this._getGroupsInvited();
+    await this._getGroupsJoined();
+    return;
+  }
+
+  _rejectGroupInvitation(groupIds) {
+    return this._client.rejectGroupInvitation(0,groupIds);
+  }
+
+  _createGroup(groupName,members) {
+    return this._client.createGroup(0,groupName,members);
   }
 
   async _acceptGroupInvitation(groupid) {
     this._client.acceptGroupInvitation(0,groupid);
-    await this._getGroupsInvited();
-    await this._getGroupsJoined();
+    await this._refrehGroup();
     return;
   }
 
@@ -196,6 +227,10 @@ class LineAPI {
     return await this._client.getGroup(groupId);
   }
 
+  _leaveGroup(gid) {
+    return this._client.leaveGroup(0,gid);
+  }
+  
   async _reissueGroupTicket(groupId) {
     return await this._client.reissueGroupTicket(groupId);
   }
@@ -258,7 +293,7 @@ class LineAPI {
   }
 
   _fetchOps(revision, count = 5) {
-    return this._client.fetchOps(revision, count);
+    return this._client.fetchOps(revision, count,0,0);
   }
 
   getJson(path) {
