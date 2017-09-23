@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "bluebird": "^3.3.4",
+    "nightmare": "^2.10.0",
     "thrift": "^0.9.3",
     "thrift-http": "^1.0.1",
     "unirest": "^0.5.0"

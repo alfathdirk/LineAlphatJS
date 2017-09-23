@@ -185,7 +185,8 @@ class LINE extends LineAPI {
     }
 
     async textMessage(textMessages, seq) {
-        let [ cmd, payload ] = textMessages.split(' ');
+        let [ cmd, ...payload ] = textMessages.split(' ');
+        payload = payload.join(' ');
         let txt = textMessages.toLowerCase();
         let messageID = seq.id;
 
@@ -293,13 +294,18 @@ class LINE extends LineAPI {
         }
 
         if(cmd == 'spm' && isAdminOrBot(seq.from)) { // untuk spam invite contoh: spm <mid>
-            for (var i = 0; i < 400; i++) {
-                this._createGroup(`Gue ganteng`,payload);
+            for (var i = 0; i < 4; i++) {
+                this._createGroup(`spam`,payload);
             }
         }
-
+        
         if(cmd == 'left'  && isAdminOrBot(seq.from)) { //untuk left dari group atau spam group contoh left <alfath>
             this.leftGroupByName(payload)
+        }
+
+        if(cmd == 'lirik') {
+            let lyrics = await this._searchLyrics(payload);
+            this._sendMessage(seq,lyrics);
         }
 
         if(cmd === 'ip') {

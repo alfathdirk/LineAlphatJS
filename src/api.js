@@ -3,8 +3,10 @@ const unirest = require('unirest');
 const qrcode = require('qrcode-terminal');
 const fs = require('fs');
 const path = require('path');
+const Lyrics = require('../helpers/lirik');
 
 const TalkService = require('../curve-thrift/TalkService');
+
 const {
   LoginResultType,
   IdentityProvider,
@@ -197,10 +199,19 @@ class LineAPI {
     return this._client.rejectGroupInvitation(0,groupIds);
   }
 
-  _createGroup(groupName,members) {
+  async _createGroup(groupName,members) {
+    await this._getAllContactIds();
     return this._client.createGroup(0,groupName,members);
   }
 
+  async _getAllContactIds(){
+    return await this._client.getAllContactIds();
+  }
+
+  async _createRoom(memberids) {
+    return await this._client.createRoom(0,[memberids]);
+  }
+  
   async _acceptGroupInvitation(groupid) {
     this._client.acceptGroupInvitation(0,groupid);
     await this._refrehGroup();
@@ -287,9 +298,9 @@ class LineAPI {
     ));
   }
   
-  _fetchOperations(revision, count = 5) {
+  async _fetchOperations(revision, count) {
     // this.options.path = this.config.LINE_POLL_URL
-    return this._client.fetchOperations(revision, count);
+    return await this._client.fetchOperations(revision, count);
   }
 
   _fetchOps(revision, count = 5) {
@@ -305,6 +316,11 @@ class LineAPI {
           res.error ? reject(res.error) : resolve(res.body)
         ))
     ));
+  }
+
+  async _searchLyrics(title) {
+    let lirik = await Lyrics(title);
+    return lirik
   }
 }
 

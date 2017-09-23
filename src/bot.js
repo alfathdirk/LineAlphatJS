@@ -1,10 +1,10 @@
 const LineConnect = require('./connect');
 let LINE = require('./main.js');
 
-// const auth = {
-// 	authToken: 'token here',
-// 	certificate: 'cert here',
-// }
+const auth = {
+	authToken: ' token disini',
+	certificate: 'cert here',
+}
 // let client =  new LineConnect(auth);
 let client =  new LineConnect();
 
@@ -12,7 +12,7 @@ client.startx().then(async (res) => {
 	
 	while(true) {
 		try {
-			ops = await client.fetchOps(res.operation.revision, 5);
+			ops = await client.fetchOps(res.operation.revision);
 		} catch(error) {
 			console.log('error',error)
 		}

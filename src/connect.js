@@ -45,17 +45,17 @@ class LineConnect extends LineAPI {
   }
   
   fetchOps(rev) {
-    return this._fetchOps(rev, 5);
+    return this._fetchOps(rev, 1);
   }
 
-  fetchOperations(rev, count = 5) {
-    return this._fetchOperations(rev, count);
+  fetchOperations(rev) {
+    return this._fetchOperations(rev, 5);
     
   }
 
   longpoll() {
     return new Promise((resolve, reject) => {
-      this._fetchOperations(this.revision, 50).then((operations) => {
+      this._fetchOps(this.revision, 1).then((operations) => {
         if (!operations) {
           console.log('No operations');
           reject('No operations');
