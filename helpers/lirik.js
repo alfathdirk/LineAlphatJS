@@ -1,7 +1,7 @@
 
 module.exports = (title) => {
   const Nightmare = require('nightmare');
-  const nightmare = Nightmare({ show: true });
+  const nightmare = Nightmare({ show: false });
   if(!title) {
     return 'please input title';
   }
