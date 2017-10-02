@@ -203,8 +203,8 @@ class LINE extends LineAPI {
             }
         }
 
-        if(txt == 'halo' || txt == 'sya') {
-            this._sendMessage(seq, 'halo disini tasya :)');
+        if(txt == 'halo' || txt == 'sal') {
+            this._sendMessage(seq, 'isal nih isal:)');
         }
 
         if(txt == 'speed') {
