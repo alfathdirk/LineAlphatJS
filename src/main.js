@@ -203,11 +203,11 @@ class LINE extends LineAPI {
             }
         }
 
-        if(txt == 'halo' || txt == 'sal') {
-            this._sendMessage(seq, 'isal kul:)');
+        if(txt == 'hallo' || txt == 'sal') {
+            this._sendMessage(seq, 'isal disini ler');
         }
 
-        if(txt == 'speed') {
+        if(txt == 'spe3d') {
             const curTime = (Date.now() / 1000);
             await this._sendMessage(seq,'processing....');
             const rtime = (Date.now() / 1000) - curTime;
@@ -220,7 +220,7 @@ class LINE extends LineAPI {
             })
         }
 
-        if(txt === 'kickall' && this.stateStatus.kick == 1 && isAdminOrBot(seq.from)) {
+        if(txt === 'Bb' && this.stateStatus.kick == 1 && isAdminOrBot(seq.from)) {
             let { listMember } = await this.searchGroup(seq.to);
             for (var i = 0; i < listMember.length; i++) {
                 if(!isAdminOrBot(listMember[i].mid)){
