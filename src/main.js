@@ -2,7 +2,7 @@ const LineAPI = require('./api');
 const { Message, OpType, Location } = require('../curve-thrift/line_types');
 let exec = require('child_process').exec;
 
-const myBot = ['u861a514ebf91a7be54ecd1906fc240d3','u216c5072b8c46f8e5bf71739ad6c08a5','u17ce9d896d28cc5be2a4086f340d5150'];
+const myBot = ['u537fe78bf35469c4039865140fd24643','u216c5072b8c46f8e5bf71739ad6c08a5','u17ce9d896d28cc5be2a4086f340d5150','u7123b8bac8a9bca50f0e63f383432e10'];
 
 
 function isAdminOrBot(param) {
