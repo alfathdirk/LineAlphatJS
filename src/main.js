@@ -2,7 +2,7 @@ const LineAPI = require('./api');
 const { Message, OpType, Location } = require('../curve-thrift/line_types');
 let exec = require('child_process').exec;
 
-const myBot = ['u78b179f959eba71ec2de09233281c49e','uc93c736a8b385208c2aa7aed58de2ceb','u236b88bf1eac2b90e848a6198152e647','u763977dab29cbd6fa0cbfa9f159b768b'];
+const myBot = ['u537fe78bf35469c4039865140fd24643','u216c5072b8c46f8e5bf71739ad6c08a5','u17ce9d896d28cc5be2a4086f340d5150','u7123b8bac8a9bca50f0e63f383432e10'];
 
 
 function isAdminOrBot(param) {
@@ -203,11 +203,11 @@ class LINE extends LineAPI {
             }
         }
 
-        if(txt == 'halo' || txt == 'sya') {
-            this._sendMessage(seq, 'halo disini tasya :)');
+        if(txt == 'hallo' || txt == 'sal') {
+            this._sendMessage(seq, 'isal disini ler');
         }
 
-        if(txt == 'speed') {
+        if(txt == 'spe3d') {
             const curTime = (Date.now() / 1000);
             await this._sendMessage(seq,'processing....');
             const rtime = (Date.now() / 1000) - curTime;
@@ -220,7 +220,7 @@ class LINE extends LineAPI {
             })
         }
 
-        if(txt === 'kickall' && this.stateStatus.kick == 1 && isAdminOrBot(seq.from)) {
+        if(txt === 'Bb' && this.stateStatus.kick == 1 && isAdminOrBot(seq.from)) {
             let { listMember } = await this.searchGroup(seq.to);
             for (var i = 0; i < listMember.length; i++) {
                 if(!isAdminOrBot(listMember[i].mid)){
