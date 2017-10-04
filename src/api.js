@@ -4,6 +4,7 @@ const qrcode = require('qrcode-terminal');
 const fs = require('fs');
 const path = require('path');
 const Lyrics = require('../helpers/lirik');
+const Ig = require('../helpers/instagram');
 
 const TalkService = require('../curve-thrift/TalkService');
 
@@ -254,21 +255,43 @@ class LineAPI {
     return await this._client.acceptGroupInvitationByTicket(0,gid,ticketID);
   }
 
-  async _sendImage(message,filepaths, filename = 'media') {
+  async _sendFileByUrl(message,uri) {
+    let media = 1;
+    if (!fs.existsSync(__dirname+'/tmp')){
+        await fs.mkdirSync(__dirname+'/tmp');
+    }
+    let head = await unirest.head(uri,async (res) => {
+      let formatFile =  res.headers['content-type'].split('/')[1].toLowerCase();
+      let locationFile = __dirname + `/tmp/${Math.floor(Math.random() * 100)}.${formatFile}`;
+      await unirest.get(uri).end().pipe(fs.createWriteStream(locationFile));
+      return this._sendFile(message,locationFile,media);
+    });
+  }
+
+  async _sendImageByUrl(message,uri) {
+    await this._sendFileByUrl(message,uri);
+  }
+
+  async _sendImage(message, filePath) {
+    this._sendFile(message,filePath, 1);
+  }
+
+  async _sendFile(message,filepaths, typeContent = 1) {
+    let filename = 'media';
     let M = new Message();
     M.to = message.to;
-    M.contentType= 1;
+    M.contentType= typeContent;
     M.contentPreview= null;
     M.contentMetadata= null;
 
     const filepath = path.resolve(__dirname,filepaths)
+    console.log('File Locate on',filepath);
     fs.readFile(filepath,async (err, bufs) => {
-      let imgID = await this._client.sendMessage(0,M).id ;
-      console.log(imgID);
+      let imgID = await this._client.sendMessage(0,M);
         const data = {
           params: JSON.stringify({
             name: filename,
-            oid: imgID,
+            oid: imgID.id,
             size: bufs.length,
             type: 'image',
             ver: '1.0'
@@ -276,12 +299,11 @@ class LineAPI {
         };
         return this
           .postContent(config.LINE_POST_CONTENT_URL, data, filepath)
-          .then((res) => (res.error ? console.log('err',res.error) : console.log('sxxxx',res)));
+          .then((res) => (res.error ? console.log('err',res.error) : res));
     });
   }
 
   postContent(url, data = null, filepath = null) {
-    console.log('head',this.config.Headers);
     return new Promise((resolve, reject) => (
       unirest.post(url)
         .headers({
@@ -292,7 +314,6 @@ class LineAPI {
         .field(data)
         .attach('files', filepath)
         .end((res) => {
-          console.log(res.error);
           res.error ? reject(res.error) : resolve(res)
         })
     ));
@@ -321,6 +342,11 @@ class LineAPI {
   async _searchLyrics(title) {
     let lirik = await Lyrics(title);
     return lirik
+  }
+
+  async _searchInstagram(username) {
+    let ig = await Ig(username);
+    return ig
   }
 }
 

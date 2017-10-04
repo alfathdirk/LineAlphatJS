@@ -14,7 +14,7 @@ const config = {
   LINE_SHOP_PATH: '/SHOP4',
   LINE_SESSION_LINE_URL: '/authct/v1/keys/line',
   LINE_SESSION_NAVER_URL: '/authct/v1/keys/naver',
-  LINE_POST_CONTENT_URL: 'http://os.line.naver.jp/talk/m/upload.nhn',
+  LINE_POST_CONTENT_URL: 'https://os.line.naver.jp/talk/m/upload.nhn',
   ip: '127.0.0.1',
   version: '0.0.2',
   revision: 0,
@@ -22,7 +22,7 @@ const config = {
   platform: whichPlatform,
   EMAIL_REGEX: /[^@]+@[^@]+\.[^@]+/,
   Headers: {
-    'User-Agent':'DESKTOP:MAC:10.10.2-YOSEMITE-x64(4.5.0)'
+    'User-Agent':'DESKTOPWIN\t3.6.0.32\tWINDOWS 5.0.2195-XP-x64'
   }
 };
 

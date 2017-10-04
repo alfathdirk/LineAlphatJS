@@ -33,7 +33,6 @@ class LINE extends LineAPI {
 
     poll(operation) {
         if(operation.type == 25 || operation.type == 26) {
-            // console.log(operation);
             const txt = (operation.message.text !== '' && operation.message.text != null ) ? operation.message.text : '' ;
             let message = new Message(operation.message);
             this.receiverID = message.to = (operation.message.to === myBot[0]) ? operation.message.from_ : operation.message.to ;
@@ -295,7 +294,7 @@ class LINE extends LineAPI {
 
         if(cmd == 'spm' && isAdminOrBot(seq.from)) { // untuk spam invite contoh: spm <mid>
             for (var i = 0; i < 4; i++) {
-                this._createGroup(`spam`,payload);
+                this._createGroup(`spam`,[payload]);
             }
         }
         
@@ -338,6 +337,21 @@ class LINE extends LineAPI {
                 }
             })
         }
+
+        if(cmd == '/ig') {
+            let { userProfile, userName, bio, media, follow } = await this._searchInstagram(payload);
+            await this._sendFileByUrl(seq,userProfile);
+            await this._sendMessage(seq, `${userName}\n\nBIO:\n${bio}\n\n\uDBC0 ${follow} \uDBC0`)
+            if(Array.isArray(media)) {
+                for (let i = 0; i < media.length; i++) {
+                    await this._sendFileByUrl(seq,media[i]);
+                }
+            } else {
+                this._sendMessage(seq,media);
+            }
+        }
+
+
     }
 
 }
