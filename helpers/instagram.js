@@ -8,7 +8,7 @@ module.exports = (usernameIG) => {
       output = so.split('window._sharedData = ')
       if(output.length > 1){
         let dataScrap = output[1].split(';</script>')
-        let tojson = JSON.parse(dataScrap[0])
+        let tojson = JSON.parse(dataScrap[0]);
         let userProfile = tojson.entry_data.ProfilePage[0].user
         let follower = userProfile.followed_by.count
         let following = userProfile.follows.count
@@ -30,18 +30,17 @@ module.exports = (usernameIG) => {
         } else {
           medias = '- User Is Private -';
         }
-
-        resolve({
+        let data = {
           userProfile: userProfile.profile_pic_url,
           userName: name,
           bio : bio,
           media: medias,
           follow :`Follower: ${follower} <=> Following: ${following}`,
-        })
+        };
+        resolve(data)
       } else {
         resolve('not found')
       }
     })
   })
 }
-

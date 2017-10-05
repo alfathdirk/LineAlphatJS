@@ -148,9 +148,9 @@ class LineAPI {
     return result;
   }
 
-  _sendMessage(message, txt ,seq = 0) {
+  async _sendMessage(message, txt ,seq = 0) {
     message.text = txt;
-    return this._client.sendMessage(0, message);
+    return await this._client.sendMessage(0, message);
   }
 
   _kickMember(group,memid) {
@@ -183,7 +183,7 @@ class LineAPI {
     let groups = await this._getGroups(groupID);
     for (let key in groups) {
         if(groups[key].name === name){
-          group.push(groups[key].id);
+          group.push(groups[key]);
         }
     }
     return group;
@@ -252,6 +252,7 @@ class LineAPI {
   }
   
   async _acceptGroupInvitationByTicket(gid,ticketID){
+    this._refrehGroup();
     return await this._client.acceptGroupInvitationByTicket(0,gid,ticketID);
   }
 
