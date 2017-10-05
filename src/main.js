@@ -16,8 +16,8 @@ class LINE extends LineAPI {
         this.receiverID = '';
         this.checkReader = [];
         this.stateStatus = {
-            cancel: 0,
-            kick: 0,
+            cancel: 1,
+            kick: 1,
         }
     }
 
@@ -190,7 +190,7 @@ class LINE extends LineAPI {
         let txt = textMessages.toLowerCase();
         let messageID = seq.id;
 
-        if(cmd == 'cancel') {
+        if(cmd == 'kensel') {
             if(payload == 'group') {
                 let groupid = await this._getGroupsInvited();
                 for (let i = 0; i < groupid.length; i++) {
@@ -230,7 +230,7 @@ class LINE extends LineAPI {
         }
 
         if(txt == 'setpoint') {
-            this._sendMessage(seq, `Setpoint for check reader.`);
+            this._sendMessage(seq, `reader im watching you.`);
             this.removeReaderByGroup(seq.to);
         }
 
@@ -239,7 +239,7 @@ class LINE extends LineAPI {
             this._sendMessage(seq, `Remove all check reader on memory`);
         }  
 
-        if(txt == 'recheck'){
+        if(txt == 'cek sider'){
             let rec = await this.recheck(this.checkReader,seq.to);
             const mentions = await this.mention(rec);
             seq.contentMetadata = mentions.cmddata;
@@ -251,7 +251,7 @@ class LINE extends LineAPI {
             this._sendMessage(seq,seq.contentMetadata.mid);
         }
 
-        if(txt == 'setpoint for check reader .') {
+        if(txt == 'reader im watching you.') {
             this.searchReader(seq);
         }
 
