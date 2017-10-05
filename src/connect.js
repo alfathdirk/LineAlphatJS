@@ -34,7 +34,7 @@ class LineConnect extends LineAPI {
   async startx () {
     if (typeof this.authToken != 'undefined'){
       await this._tokenLogin(this.authToken, this.certificate);
-      // this._client.removeAllMessages(); //Fix Chat Spam When Bot Started (This bug only appears when u are login using authToken)
+      this._client.removeAllMessages(); //Fix Chat Spam When Bot Started (This bug only appears when u are login using authToken)
       return this.longpoll();
     } else {
       return new Promise((resolve, reject) => {
