@@ -306,7 +306,10 @@ class LineAPI {
               return;
             }
             fs.unlink(filepath, (err) => {
-              if (err) throw err;
+              if (err) {
+                console.log('err on upload',err);
+                return err
+              };
               console.log(`successfully deleted ${filepath}`);
             });
           });
