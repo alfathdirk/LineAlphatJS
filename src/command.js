@@ -186,7 +186,7 @@ class Command extends LineAPI {
             }
             return;
         } 
-        for (let z = 0; z < spamName.length; z++) {
+        for (let z = 0; z < this.spamName.length; z++) {
             this.leftGroupByName(this.spamName[z]);
         }
         return true;
