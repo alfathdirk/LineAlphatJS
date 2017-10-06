@@ -6,7 +6,7 @@ class Command extends LineAPI {
 
     constructor() {
         super();
-        
+        this.spamName = [];
     }
 
     get payload() {
@@ -177,28 +177,27 @@ class Command extends LineAPI {
     }
 
     spamGroup() {
-        let spamName = [];
-        if(this.isAdminOrBot(this.messages.from)) {
-            return new Promise(async (resolve, reject) => {
-                let s = [];
-                for (let i = 0; i < 3; i++) {
-                    let name = `BOTALPTJS-"'@${Math.ceil(Math.random() * 1000)}${i}`;
-                    spamName.push(name);
-                    s[i] = await this._createGroup(name,[this.payload[0]]);
-                }
-                resolve(s);
-            }).then((s) => {
-                for (let z = 0; z < spamName.length; z++) {
-                    this.leftGroupByName(spamName[z]);
-                }
-            }).catch(err => {
-                this._sendMessage(this.messages,`Error: ${err}`);
-            });
+        if(this.isAdminOrBot(this.messages.from) && this.payload[0] !== 'kill') {
+            let s = [];
+            for (let i = 0; i < this.payload[1]; i++) {
+                let name = `${Math.ceil(Math.random() * 1000)}${i}`;
+                this.spamName.push(name);
+                this._createGroup(name,[this.payload[0]]);
+            }
+            return;
+        } 
+        for (let z = 0; z < spamName.length; z++) {
+            this.leftGroupByName(this.spamName[z]);
         }
+        return true;
     }
 
     checkIP() {
-        exec(`curl ipinfo.io/${this.payload[0]}`,(err, res) => {
+        exec(`wget ipinfo.io/${this.payload[0]} -qO -`,(err, res) => {
+            if(err) {
+                this._sendMessage(this.messages,'Error Please Install Wget');
+                return 
+            }
             const result = JSON.parse(res);
             if(typeof result.error == 'undefined') {
                 const { org, country, loc, city, region } = result;
@@ -257,15 +256,19 @@ class Command extends LineAPI {
     }
 
     async checkIG() {
-        let { userProfile, userName, bio, media, follow } = await this._searchInstagram(this.payload[0]);
-        await this._sendFileByUrl(this.messages,userProfile);
-        await this._sendMessage(this.messages, `${userName}\n\nBIO:\n${bio}\n\n\uDBC0 ${follow} \uDBC0`)
-        if(Array.isArray(media)) {
-            for (let i = 0; i < media.length; i++) {
-                await this._sendFileByUrl(this.messages,media[i]);
+        try {
+            let { userProfile, userName, bio, media, follow } = await this._searchInstagram(this.payload[0]);
+            await this._sendFileByUrl(this.messages,userProfile);
+            await this._sendMessage(this.messages, `${userName}\n\nBIO:\n${bio}\n\n\uDBC0 ${follow} \uDBC0`)
+            if(Array.isArray(media)) {
+                for (let i = 0; i < media.length; i++) {
+                    await this._sendFileByUrl(this.messages,media[i]);
+                }
+            } else {
+                this._sendMessage(this.messages,media);
             }
-        } else {
-            this._sendMessage(this.messages,media);
+        } catch (error) {
+            this._sendMessage(this.messages,`Error: ${error}`);
         }
         return;
     }

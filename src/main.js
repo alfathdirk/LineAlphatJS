@@ -135,7 +135,7 @@ class LINE extends Command {
         this.command(`.qr ${payload}`,this.qrOpenClose.bind(this))
         this.command(`.joinqr ${payload}`,this.joinQr.bind(this));
         this.command(`.spam ${payload}`,this.spamGroup.bind(this));
-
+        
         if(messages.contentType == 13) {
             messages.contentType = 0;
             this._sendMessage(messages,messages.contentMetadata.mid);

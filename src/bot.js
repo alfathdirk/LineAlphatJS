@@ -2,9 +2,9 @@ const LineConnect = require('./connect');
 let line = require('./main.js');
 let LINE = new line();
 
-const auth = {
-	authToken: ' token here '
-}
+// const auth = {
+// 	authToken: ' auth token here ',
+// }
 // let client =  new LineConnect(auth);
 let client =  new LineConnect();
 

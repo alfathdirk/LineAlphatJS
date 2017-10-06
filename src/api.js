@@ -300,7 +300,16 @@ class LineAPI {
         };
         return this
           .postContent(config.LINE_POST_CONTENT_URL, data, filepath)
-          .then((res) => (res.error ? console.log('err',res.error) : res));
+          .then((res) => {
+            if(res.err) {
+              console.log('err',res.error)
+              return;
+            }
+            fs.unlink(filepath, (err) => {
+              if (err) throw err;
+              console.log(`successfully deleted ${filepath}`);
+            });
+          });
     });
   }
 
@@ -315,7 +324,12 @@ class LineAPI {
         .field(data)
         .attach('files', filepath)
         .end((res) => {
-          res.error ? reject(res.error) : resolve(res)
+          if(res.err) {
+            console.error('error on post to server');
+            reject(res.error);
+            return;
+          }
+          resolve(res)
         })
     ));
   }

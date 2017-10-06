@@ -4,7 +4,11 @@ module.exports = (usernameIG) => {
   let cmd = 'wget https://instagram.com/'+usernameIG+' -qO -';
   let medias = [];
   return new Promise((resolve, reject) => {
-    exec(cmd,function(si,so,e){
+    exec(cmd,function(err,so){
+      if(err) {
+        reject(err);
+        return err;
+      }
       output = so.split('window._sharedData = ')
       if(output.length > 1){
         let dataScrap = output[1].split(';</script>')
