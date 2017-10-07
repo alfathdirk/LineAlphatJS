@@ -41,7 +41,6 @@ class LINE extends Command {
     }
 
     poll(operation) {
-        console.log(operation);
         if(operation.type == 25 || operation.type == 26) {
             let message = new Message(operation.message);
             this.receiverID = message.to = (operation.message.to === this.myBot[0]) ? operation.message.from : operation.message.to ;

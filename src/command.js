@@ -18,7 +18,6 @@ class Command extends LineAPI {
 
     async getProfile() {
         let { displayName } = await this._myProfile();
-        console.log('asdf',displayName);
         return displayName;
     }
 
@@ -195,7 +194,6 @@ class Command extends LineAPI {
     }
     
     async doUpload({ id, contentType }) {
-        console.log('msg',id);
         let url = `https://obs-sg.line-apps.com/talk/m/download.nhn?oid=${id}`;
         await this._download(url,this.stateUpload.name, contentType);
         this.messages.contentType = 0;
@@ -207,7 +205,13 @@ class Command extends LineAPI {
     searchLocalImage() {
         let name = this.payload.join(' ');
         let dirName = `${__dirname}/../download/${name}.jpg`;
-        return this._sendImage(this.messages,dirName);
+        try {
+            this._sendImage(this.messages,dirName);
+        } catch (error) {
+             this._sendImage(this.messages,`No Photo #${name} Uploaded `);
+        }
+        return ;
+        
     }
 
     async joinQr() {
