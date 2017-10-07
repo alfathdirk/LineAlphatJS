@@ -7,7 +7,7 @@ const Lyrics = require('../helpers/lirik');
 const Ig = require('../helpers/instagram');
 
 const TalkService = require('../curve-thrift/TalkService');
-
+        
 const {
   LoginResultType,
   IdentityProvider,
