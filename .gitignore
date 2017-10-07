@@ -3,3 +3,5 @@ node_modules
 line.thrift
 src/bot.js
 src/tmp
+test.js
+download/

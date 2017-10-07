@@ -32,7 +32,8 @@ class LineAPI {
     path: this.config.LINE_HTTP_URL,
     https: true
   }) {
-    options.headers['X-Line-Application'] = 'DESKTOPMAC 10.10.2-YOSEMITE-x64 MAC 4.5.0';
+    // options.headers['X-Line-Application'] = 'DESKTOPMAC 10.10.2-YOSEMITE-x64 MAC 4.5.1';
+    options.headers['X-Line-Application'] = 'CHROMEOS\x091.4.13\x09Chrome_OS\x091';
     this.options = options;
     this.connection =
       thrift.createHttpConnection(this.config.LINE_DOMAIN, 443, this.options);
@@ -59,7 +60,7 @@ class LineAPI {
       qrcode.generate(qrcodeUrl,{small: true});
       console.info(`\n\nlink qr code is: ${qrcodeUrl}`)
       Object.assign(this.config.Headers,{ 'X-Line-Access': result.verifier });
-        unirest.get('https://gd2.line.naver.jp/Q')
+        unirest.get(`https://${this.config.LINE_DOMAIN}/Q`)
           .headers(this.config.Headers)
           .timeout(120000)
           .end(async (res) => {
@@ -67,8 +68,8 @@ class LineAPI {
             const { authToken, certificate } =
               await this._client.loginWithVerifierForCerificate(verifiedQr);
             this.options.headers['X-Line-Access'] = authToken;
-            this.options.path = this.config.LINE_COMMAND_PATH;
-            this.setTHttpClient(this.options);
+            // this.options.path = this.config.LINE_COMMAND_PATH;
+            this.setTHttpClient();
             resolve({ authToken, certificate });
           });
       });
@@ -227,6 +228,10 @@ class LineAPI {
     return await this._client.updateGroup(0, group)
   }
 
+  async _updateProfile(profile) {
+    return await this._client.updateProfile(0, profile)
+  }
+
   _getContacts(mid) {
     return this._client.getContacts(mid)
   }
@@ -277,13 +282,55 @@ class LineAPI {
     this._sendFile(message,filePath, 1);
   }
 
+  async _download(uri,name,type) {
+    let formatType;
+    switch (type) {
+      case 3:
+        formatType = 'm4a';
+        break;
+      default:
+        formatType = 'jpg';
+        break;
+    }
+    let dir = __dirname+'/../download';
+    if (!fs.existsSync(dir)){
+      await fs.mkdirSync(dir);
+    }
+    await unirest
+    .get(uri)
+    .headers({
+      ...this.config.Headers
+    })
+    .end((res) => {
+        if(res.error) {
+            console.log(res.error);
+            return 'err';
+        }
+    }).pipe(fs.createWriteStream(`${dir}/${name}.${formatType}`));
+  }
+
   async _sendFile(message,filepaths, typeContent = 1) {
     let filename = 'media';
+    let typeFile;
+    
+    switch (typeContent) {
+      case 2:
+        typeFile = 'video'
+        break;
+      case 3:
+        typeFile = 'audio'
+        break;
+      default:
+        typeFile = 'image'
+        break;
+    }
+
     let M = new Message();
     M.to = message.to;
     M.contentType= typeContent;
     M.contentPreview= null;
     M.contentMetadata= null;
+
 
     const filepath = path.resolve(__dirname,filepaths)
     console.log('File Locate on',filepath);
@@ -294,7 +341,7 @@ class LineAPI {
             name: filename,
             oid: imgID.id,
             size: bufs.length,
-            type: 'image',
+            type: typeFile,
             ver: '1.0'
           })
         };
@@ -304,14 +351,18 @@ class LineAPI {
             if(res.err) {
               console.log('err',res.error)
               return;
+            } 
+            console.log(res.headers);
+            if(filepath.search(/download\//g) === -1) {
+              fs.unlink(filepath, (err) => {
+                if (err) {
+                  console.log('err on upload',err);
+                  return err
+                };
+                console.log(`successfully deleted ${filepath}`);
+              });
             }
-            fs.unlink(filepath, (err) => {
-              if (err) {
-                console.log('err on upload',err);
-                return err
-              };
-              console.log(`successfully deleted ${filepath}`);
-            });
+            
           });
     });
   }

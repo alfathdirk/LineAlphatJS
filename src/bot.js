@@ -3,7 +3,7 @@ let line = require('./main.js');
 let LINE = new line();
 
 // const auth = {
-// 	authToken: ' auth token here ',
+// 	authToken: ' Token Here',
 // }
 // let client =  new LineConnect(auth);
 let client =  new LineConnect();

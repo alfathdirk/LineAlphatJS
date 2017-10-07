@@ -1,9 +1,5 @@
 const Command = require('./command');
-const { Message, OpType, Location } = require('../curve-thrift/line_types');
-
-
-
-
+const { Message, OpType, Location, Profile } = require('../curve-thrift/line_types');
 
 class LINE extends Command {
     constructor() {
@@ -16,10 +12,17 @@ class LINE extends Command {
         };
         this.messages;
         this.payload;
+        this.stateUpload =  {
+                file: '',
+                name: '',
+                group: '',
+                sender: ''
+            }
     }
 
+
     get myBot() {
-        const bot = ['u78b179f959eba71ec2de09233281c49e','uc93c736a8b385208c2aa7aed58de2ceb','u236b88bf1eac2b90e848a6198152e647','u763977dab29cbd6fa0cbfa9f159b768b'];
+        const bot = ['u3b257ce1497b8d24ec3708ba3ed79d46','u236b88bf1eac2b90e848a6198152e647','u763977dab29cbd6fa0cbfa9f159b768b'];
         return bot; 
     }
 
@@ -38,15 +41,23 @@ class LINE extends Command {
     }
 
     poll(operation) {
+        console.log(operation);
         if(operation.type == 25 || operation.type == 26) {
             let message = new Message(operation.message);
-            this.receiverID = message.to = (operation.message.to === this.myBot[0]) ? operation.message.from_ : operation.message.to ;
+            this.receiverID = message.to = (operation.message.to === this.myBot[0]) ? operation.message.from : operation.message.to ;
             Object.assign(message,{ ct: operation.createdTime.toString() });
             this.textMessage(message)
         }
 
         if(operation.type == 13 && this.stateStatus.cancel == 1) {
-            this.cancelAll(operation.param1);
+            this._cancel(operation.param2,operation.param1);
+            
+        }
+
+        if(operation.type == 11 && !this.isAdminOrBot(operation.param2) && this.stateStatus.qrp == 1) {
+            this._kickMember(operation.param1,[operation.param2]);
+            this.messages.to = operation.param1;
+            this.qrOpenClose();
         }
 
         if(operation.type == 19) { //ada kick
@@ -124,6 +135,7 @@ class LINE extends Command {
         this.command('.kernel', this.checkKernel.bind(this));
         this.command(`kick ${payload}`, this.OnOff.bind(this));
         this.command(`cancel ${payload}`, this.OnOff.bind(this));
+        this.command(`qrp ${payload}`, this.OnOff.bind(this));
         this.command(`.kickall ${payload}`,this.kickAll.bind(this));
         this.command(`.cancelall ${payload}`, this.cancelMember.bind(this));
         this.command(`.set`,this.setReader.bind(this));
@@ -135,10 +147,30 @@ class LINE extends Command {
         this.command(`.qr ${payload}`,this.qrOpenClose.bind(this))
         this.command(`.joinqr ${payload}`,this.joinQr.bind(this));
         this.command(`.spam ${payload}`,this.spamGroup.bind(this));
-        
+        this.command(`.creator`,this.creator.bind(this));
+
+        this.command(`pap ${payload}`,this.searchLocalImage.bind(this));
+        this.command(`.upload ${payload}`,this.prepareUpload.bind(this));
+        this.command(`vn ${payload}`,this.vn.bind(this));
+
         if(messages.contentType == 13) {
             messages.contentType = 0;
-            this._sendMessage(messages,messages.contentMetadata.mid);
+            if(!this.isAdminOrBot(messages.contentMetadata.mid)) {
+                this._sendMessage(messages,messages.contentMetadata.mid);
+            }
+            return;
+        }
+
+        if(this.stateUpload.group == messages.to && [1,2,3].includes(messages.contentType)) {
+            if(sender === this.stateUpload.sender) {
+                this.doUpload(messages);
+                return;
+            } else {
+                messages.contentType = 0;
+                this._sendMessage(messages,'Wrong Sender !! Reseted');
+            }
+            this.resetStateUpload();
+            return;
         }
 
         // if(cmd == 'lirik') {

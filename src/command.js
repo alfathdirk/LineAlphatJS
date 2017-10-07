@@ -128,10 +128,14 @@ class Command extends LineAPI {
 
     async getSpeed() {
         let curTime = Date.now() / 1000;
-        this._sendMessage(this.messages, 'Read Time');
+        await this._sendMessage(this.messages, 'Read Time');
         const rtime = (Date.now() / 1000) - curTime;
-        this._sendMessage(this.messages, `${rtime} Second`);
+        await this._sendMessage(this.messages, `${rtime} Second`);
         return;
+    }
+
+    vn() {
+        this._sendFile(this.messages,`${__dirname}/../download/${this.payload.join(' ')}.m4a`,3);
     }
 
     checkKernel() {
@@ -146,7 +150,7 @@ class Command extends LineAPI {
     }
 
     setReader() {
-        this._sendMessage(this.messages, `Setpoint...type '.recheck' for lookup !`);
+        this._sendMessage(this.messages, `Setpoint... type '.recheck' for lookup !`);
         this.removeReaderByGroup(this.messages.to);
         return;
     }
@@ -157,20 +161,72 @@ class Command extends LineAPI {
         return
     }
 
+    creator() {
+        let msg = {
+            text:null,
+            contentType: 13,
+            contentPreview: null,
+            contentMetadata: 
+            { mid: 'u236b88bf1eac2b90e848a6198152e647',
+            displayName: 'Alfath Dirk' }
+        }
+        Object.assign(this.messages,msg);
+        this._sendMessage(this.messages);
+    }
+    
+    resetStateUpload() {
+        this.stateUpload = {
+            file: '',
+            name: '',
+            group: '',
+            sender: ''
+        };
+    }
+
+    prepareUpload() {
+        this.stateUpload = {
+            file: true,
+            name: this.payload.join(' '),
+            group: this.messages.to,
+            sender: this.messages.from
+        };
+        this._sendMessage(this.messages,`select pict/video for upload ${this.stateUpload.name}`);
+        return;
+    }
+    
+    async doUpload({ id, contentType }) {
+        console.log('msg',id);
+        let url = `https://obs-sg.line-apps.com/talk/m/download.nhn?oid=${id}`;
+        await this._download(url,this.stateUpload.name, contentType);
+        this.messages.contentType = 0;
+        this._sendMessage(this.messages,`Upload ${this.stateUpload.name} success !!`);
+        this.resetStateUpload()
+        return;
+    }
+
+    searchLocalImage() {
+        let name = this.payload.join(' ');
+        let dirName = `${__dirname}/../download/${name}.jpg`;
+        return this._sendImage(this.messages,dirName);
+    }
+
     async joinQr() {
         const [ ticketId ] = this.payload[0].split('g/').splice(-1);
         let { id } = await this._findGroupByTicket(ticketId);
         await this._acceptGroupInvitationByTicket(id,ticketId);
         return;
     }
+
     async qrOpenClose() {
-        let [ type ] = this.payload;
         let updateGroup = await this._getGroup(this.messages.to);
         updateGroup.preventJoinByTicket = true;
-        if(type === 'open') {
-            updateGroup.preventJoinByTicket = false;
-            const groupUrl = await this._reissueGroupTicket(this.messages.to)
-            this._sendMessage(this.messages,`Line group = line://ti/g/${groupUrl}`);
+        if(typeof this.payload !== 'undefined') {
+            let [ type ] = this.payload;
+            if(type === 'open') {
+                updateGroup.preventJoinByTicket = false;
+                const groupUrl = await this._reissueGroupTicket(this.messages.to)
+                this._sendMessage(this.messages,`Line group = line://ti/g/${groupUrl}`);
+            }
         }
         await this._updateGroup(updateGroup);
         return;

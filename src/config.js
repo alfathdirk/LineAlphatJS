@@ -3,13 +3,13 @@ const { hostname, platform } = require('os');
 const whichPlatform = platform() === 'darwin' ? 'MAC' : 'win32';
 
 const config = {
-  LINE_DOMAIN: 'gf.line.naver.jp',
+  LINE_DOMAIN: 'gfs.line.naver.jp',
   // LINE_DOMAIN: 'gd2.line.naver.jp',
   LINE_OS_URL: 'os.line.naver.jp',
   LINE_HTTP_URL: '/api/v4/TalkService.do',
   LINE_STICKER_URL: 'dl.stickershop.line.naver.jp/products/',
-  LINE_POLL_URL: '/P4',
-  LINE_COMMAND_PATH: '/S4',
+  LINE_POLL_URL: '/P3',
+  LINE_COMMAND_PATH: '/S3',
   LINE_CERTIFICATE_URL: '/Q',
   LINE_SHOP_PATH: '/SHOP4',
   LINE_SESSION_LINE_URL: '/authct/v1/keys/line',
@@ -22,7 +22,7 @@ const config = {
   platform: whichPlatform,
   EMAIL_REGEX: /[^@]+@[^@]+\.[^@]+/,
   Headers: {
-    'User-Agent':'DESKTOPWIN\t3.6.0.32\tWINDOWS 5.0.2195-XP-x64'
+    'User-Agent':'Alfath Dirk'
   }
 };
 
