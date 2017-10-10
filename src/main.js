@@ -9,6 +9,8 @@ class LINE extends Command {
         this.stateStatus = {
             cancel: 0,
             kick: 0,
+            qrp: 0,
+            autokick: 0,
         };
         this.messages;
         this.payload;
@@ -22,7 +24,7 @@ class LINE extends Command {
 
 
     get myBot() {
-        const bot = ['u3b257ce1497b8d24ec3708ba3ed79d46','u236b88bf1eac2b90e848a6198152e647','u763977dab29cbd6fa0cbfa9f159b768b'];
+        const bot = ['u3e83144b0385dea6fd3837f94e5132ff','u3a352507eb3429d27d1b310198982a3d'];
         return bot; 
     }
 
@@ -59,19 +61,17 @@ class LINE extends Command {
             this.qrOpenClose();
         }
 
-        if(operation.type == 19) { //ada kick
+        if(operation.type == 19 && this.stateStatus.autokick == 1) { 
+            //ada kick
             // op1 = group nya
             // op2 = yang 'nge' kick
             // op3 = yang 'di' kick
-            if(this.isAdminOrBot(operation.param3)) {
-                this._invite(operation.param1,[operation.param3]);
-            }
-            if(!this.isAdminOrBot(operation.param2)){
+            if(!isAdminOrBot(operation.param2)) {
                 this._kickMember(operation.param1,[operation.param2]);
+                this._invite(operation.param1,[operation.param3]);              
             } 
 
         }
-
         if(operation.type == 55){ //ada reader
             const idx = this.checkReader.findIndex((v) => {
                 if(v.group == operation.param1) {
@@ -102,7 +102,12 @@ class LINE extends Command {
         this.getOprationType(operation);
     }
 
-    command(msg, reply) {
+        if(txt == 'creator') {
+         seq.contentType=13;
+            seq.contentMetadata = { mid: 'u3a352507eb3429d27d1b310198982a3d' };
+            this._client.sendMessage(1, seq);
+        }
+command(msg, reply) {
         if(this.messages.text !== null) {
             if(this.messages.text === msg.trim()) {
                 if(typeof reply === 'function') {
@@ -126,30 +131,30 @@ class LINE extends Command {
         let receiver = messages.to;
         let sender = messages.from;
         
-        this.command('Halo', ['halo juga','ini siapa?']);
-        this.command('kamu siapa', this.getProfile.bind(this));
-        this.command('.status', `Your Status: ${JSON.stringify(this.stateStatus)}`);
-        this.command(`.left ${payload}`, this.leftGroupByName.bind(this));
-        this.command('.speed', this.getSpeed.bind(this));
-        this.command('.kernel', this.checkKernel.bind(this));
+        this.command('Ryandika', ['Ryandika siap']);
+        this.command('Oaja', this.getProfile.bind(this));
+        this.command('status', `Your Status: ${JSON.stringify(this.stateStatus)}`);
+        this.command(`left ${payload}`, this.leftGroupByName.bind(this));
+        this.command('speed', this.getSpeed.bind(this));
+        this.command('kernel', this.checkKernel.bind(this));
         this.command(`kick ${payload}`, this.OnOff.bind(this));
         this.command(`cancel ${payload}`, this.OnOff.bind(this));
         this.command(`qrp ${payload}`, this.OnOff.bind(this));
-        this.command(`.kickall ${payload}`,this.kickAll.bind(this));
-        this.command(`.cancelall ${payload}`, this.cancelMember.bind(this));
-        this.command(`.set`,this.setReader.bind(this));
-        this.command(`.recheck`,this.rechecks.bind(this));
-        this.command(`.clearall`,this.clearall.bind(this));
-        this.command('.myid',`Your ID: ${messages.from}`)
-        this.command(`.ip ${payload}`,this.checkIP.bind(this))
-        this.command(`.ig ${payload}`,this.checkIG.bind(this))
-        this.command(`.qr ${payload}`,this.qrOpenClose.bind(this))
-        this.command(`.joinqr ${payload}`,this.joinQr.bind(this));
-        this.command(`.spam ${payload}`,this.spamGroup.bind(this));
-        this.command(`.creator`,this.creator.bind(this));
+        this.command(`bkontol ${payload}`,this.kickAll.bind(this));
+        this.command(`gajadisemuanya ${payload}`, this.cancelMember.bind(this));
+        this.command(`setpoint`,this.setReader.bind(this));
+        this.command(`sider`,this.rechecks.bind(this));
+        this.command(`clearall`,this.clearall.bind(this));
+        this.command('myid',`Your ID: ${messages.from}`)
+        this.command(`ip ${payload}`,this.checkIP.bind(this))
+        this.command(`ig ${payload}`,this.checkIG.bind(this))
+        this.command(`qr ${payload}`,this.qrOpenClose.bind(this))
+        this.command(`joinqr ${payload}`,this.joinQr.bind(this));
+        this.command(`spam ${payload}`,this.spamGroup.bind(this));
+        this.command(`creator`,this.creator.bind(this));
 
         this.command(`pap ${payload}`,this.searchLocalImage.bind(this));
-        this.command(`.upload ${payload}`,this.prepareUpload.bind(this));
+        this.command(`upload ${payload}`,this.prepareUpload.bind(this));
         this.command(`vn ${payload}`,this.vn.bind(this));
 
         if(messages.contentType == 13) {
