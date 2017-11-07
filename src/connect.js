@@ -38,7 +38,7 @@ class LineConnect extends LineAPI {
       this._client.getLastOpRevision((err,result)=>{
           let val = result.toString().split(" ");
           this.revision = val[0] - 1;
-          resolve(this.longpoll());
+          return this.longpoll();
       })
     } else {
       return new Promise((resolve, reject) => {
