@@ -22,8 +22,10 @@ class LINE extends Command {
 
 
     get myBot() {
-        const bot = ['u3b257ce1497b8d24ec3708ba3ed79d46','u236b88bf1eac2b90e848a6198152e647','u763977dab29cbd6fa0cbfa9f159b768b'];
+        const bot = ['ua4872a5a9a3b3be7cb07668b486c0e19'];
         return bot; 
+        const myAdmin = ['ua4872a5a9a3b3be7cb07668b486c0e19'];
+        return myAdmin;
     }
 
     isAdminOrBot(param) {
@@ -132,9 +134,9 @@ class LINE extends Command {
         this.command(`.left ${payload}`, this.leftGroupByName.bind(this));
         this.command('.speed', this.getSpeed.bind(this));
         this.command('.kernel', this.checkKernel.bind(this));
-        this.command(`kick ${payload}`, this.OnOff.bind(this));
-        this.command(`cancel ${payload}`, this.OnOff.bind(this));
-        this.command(`qrp ${payload}`, this.OnOff.bind(this));
+        this.command(`.kick ${payload}`, this.OnOff.bind(this));
+        this.command(`.cancel ${payload}`, this.OnOff.bind(this));
+        this.command(`.qrp ${payload}`, this.OnOff.bind(this));
         this.command(`.kickall ${payload}`,this.kickAll.bind(this));
         this.command(`.cancelall ${payload}`, this.cancelMember.bind(this));
         this.command(`.set`,this.setReader.bind(this));
@@ -148,9 +150,9 @@ class LINE extends Command {
         this.command(`.spam ${payload}`,this.spamGroup.bind(this));
         this.command(`.creator`,this.creator.bind(this));
 
-        this.command(`pap ${payload}`,this.searchLocalImage.bind(this));
+        this.command('.pap ${payload}`,this.searchLocalImage.bind(this));
         this.command(`.upload ${payload}`,this.prepareUpload.bind(this));
-        this.command(`vn ${payload}`,this.vn.bind(this));
+        this.command(`.vn ${payload}`,this.vn.bind(this));
 
         if(messages.contentType == 13) {
             messages.contentType = 0;
