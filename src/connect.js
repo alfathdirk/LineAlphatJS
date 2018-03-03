@@ -35,6 +35,7 @@ class LineConnect extends LineAPI {
         console.info("[*] ChannelTokenExpire: "+expireCH+"\n");
         console.info(`NOTE: Dont forget , put your mid and admin on variable 'myBot' in main.js \n`);
         console.info(`Regrads Alfathdirk and thx for TCR Team \n`);
+        console.info(`Fixed by Ervan R.F @LD TEAM\n`);
         console.info(`=======BOT RUNNING======\n`);
         resolve();
       });
