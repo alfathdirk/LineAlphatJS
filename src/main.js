@@ -22,7 +22,7 @@ class LINE extends Command {
 
 
     get myBot() {
-        const bot = ['u3b257ce1497b8d24ec3708ba3ed79d46','u236b88bf1eac2b90e848a6198152e647','u763977dab29cbd6fa0cbfa9f159b768b'];
+        const bot = ['u1cab5ef6299af4713353b9843479952d','u22d94aac4e1659eb6f375ffc7cb17a53'];
         return bot; 
     }
 
@@ -43,7 +43,7 @@ class LINE extends Command {
     poll(operation) {
         if(operation.type == 25 || operation.type == 26) {
             let message = new Message(operation.message);
-            this.receiverID = message.to = (operation.message.to === this.myBot[0]) ? operation.message.from : operation.message.to ;
+            this.receiverID = message.to = (operation.message.to === this.myBot[0]) ? operation.message._from : operation.message.to ;
             Object.assign(message,{ ct: operation.createdTime.toString() });
             this.textMessage(message)
         }
