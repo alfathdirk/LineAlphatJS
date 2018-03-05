@@ -54,7 +54,7 @@ class Command extends LineAPI {
     }
 
     OnOff() {
-        if(this.isAdminOrBot(this.messages.from)){
+        if(this.isAdminOrBot(this.messages._from)){
             let [ actions , status ] = this.messages.text.split(' ');
             const action = actions.toLowerCase();
             const state = status.toLowerCase() == 'on' ? 1 : 0;
@@ -187,7 +187,7 @@ class Command extends LineAPI {
             file: true,
             name: this.payload.join(' '),
             group: this.messages.to,
-            sender: this.messages.from
+            sender: this.messages._from
         };
         this._sendMessage(this.messages,`select pict/video for upload ${this.stateUpload.name}`);
         return;
@@ -237,7 +237,7 @@ class Command extends LineAPI {
     }
 
     spamGroup() {
-        if(this.isAdminOrBot(this.messages.from) && this.payload[0] !== 'kill') {
+        if(this.isAdminOrBot(this.messages._from) && this.payload[0] !== 'kill') {
             let s = [];
             for (let i = 0; i < this.payload[1]; i++) {
                 let name = `${Math.ceil(Math.random() * 1000)}${i}`;
@@ -298,7 +298,7 @@ class Command extends LineAPI {
 
     async kickAll() {
         let groupID;
-        if(this.stateStatus.kick == 1 && this.isAdminOrBot(this.messages.from)) {
+        if(this.stateStatus.kick == 1 && this.isAdminOrBot(this.messages._from)) {
             let target = this.messages.to;
             if(this.payload.length > 0) {
                 let [ groups ] = await this._findGroupByName(this.payload.join(' '));
