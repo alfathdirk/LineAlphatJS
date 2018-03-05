@@ -30,7 +30,6 @@
     "request": "^2.83.0",
     "request-promise": "^4.2.2",
     "webp-converter": "^2.1.6",
-    "moment": "^2.18.1",
-    "nightmare": "^2.10.0"
+    "moment": "^2.18.1"
   }
 }
