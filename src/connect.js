@@ -55,7 +55,7 @@ class LineConnect extends LineAPI {
           resolve(this.longpoll());
         })
       });
-        });
+    });
     } else if(this.password && this.email){
     return new Promise((resolve, reject) => {
       this._xlogin(this.email,this.password).then(()=>{
