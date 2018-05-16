@@ -223,11 +223,11 @@ class Command extends LineAPI {
 
     async qrOpenClose() {
         let updateGroup = await this._getGroup(this.messages.to);
-        updateGroup.preventJoinByTicket = true;
+        updateGroup.preventedJoinByTicket = true;
         if(typeof this.payload !== 'undefined') {
             let [ type ] = this.payload;
             if(type === 'open') {
-                updateGroup.preventJoinByTicket = false;
+                updateGroup.preventedJoinByTicket = false;
                 const groupUrl = await this._reissueGroupTicket(this.messages.to)
                 this._sendMessage(this.messages,`Line group = line://ti/g/${groupUrl}`);
             }
